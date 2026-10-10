@@ -84,17 +84,9 @@ fn upgrade() {
     flags,
     Flags {
       subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: true,
         dry_run: true,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
+        force: true,
         output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: None,
-        branch: None,
       }),
       ..Flags::default()
     }
@@ -108,17 +100,9 @@ fn upgrade_with_output_flag() {
     r.unwrap(),
     Flags {
       subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
         dry_run: false,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
+        force: false,
         output: Some(String::from("example.txt")),
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: None,
-        branch: None,
       }),
       ..Flags::default()
     }
@@ -4565,136 +4549,14 @@ fn upgrade_with_ca_file() {
     r.unwrap(),
     Flags {
       subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
         dry_run: false,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
+        force: false,
         output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: None,
-        branch: None,
       }),
       ca_data: Some(CaData::File("example.crt".to_owned())),
       ..Flags::default()
     }
   );
-}
-
-#[test]
-fn upgrade_release_candidate() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "--rc"]);
-  assert_eq!(
-    r.unwrap(),
-    Flags {
-      subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
-        dry_run: false,
-        canary: false,
-        no_delta: false,
-        release_candidate: true,
-        version: None,
-        output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: None,
-        branch: None,
-      }),
-      ..Flags::default()
-    }
-  );
-
-  let r = flags_from_vec(svec!["deno", "upgrade", "--rc", "--canary"]);
-  assert!(r.is_err());
-
-  let r = flags_from_vec(svec!["deno", "upgrade", "--rc", "--version"]);
-  assert!(r.is_err());
-}
-
-#[test]
-fn upgrade_pr() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "pr", "12345"]);
-  assert_eq!(
-    r.unwrap(),
-    Flags {
-      subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
-        dry_run: false,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
-        output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: Some(12345),
-        branch: None,
-      }),
-      ..Flags::default()
-    }
-  );
-}
-
-#[test]
-fn upgrade_pr_with_hash_prefix() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "pr", "#6789"]);
-  assert_eq!(
-    r.unwrap(),
-    Flags {
-      subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
-        dry_run: false,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
-        output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: Some(6789),
-        branch: None,
-      }),
-      ..Flags::default()
-    }
-  );
-}
-
-#[test]
-fn upgrade_pr_with_flags() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "--dry-run", "pr", "33250"]);
-  assert_eq!(
-    r.unwrap(),
-    Flags {
-      subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
-        dry_run: true,
-        canary: false,
-        no_delta: false,
-        release_candidate: false,
-        version: None,
-        output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: Some(33250),
-        branch: None,
-      }),
-      ..Flags::default()
-    }
-  );
-}
-
-#[test]
-fn upgrade_pr_missing_number() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "pr"]);
-  assert!(r.is_err());
-}
-
-#[test]
-fn upgrade_pr_invalid_number() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "pr", "abc"]);
-  assert!(r.is_err());
 }
 
 #[test]
@@ -9813,30 +9675,6 @@ fn serve_compile_keep_double_dash() {
     flags_from_vec(svec!["deno", "compile", "x.ts", "--", "-a"]).unwrap();
   assert!(
     matches!(flags.subcommand, DenoSubcommand::Compile(c) if c.args == svec!["--", "-a"])
-  );
-}
-
-#[test]
-fn upgrade_no_delta() {
-  let r = flags_from_vec(svec!["deno", "upgrade", "--no-delta"]);
-  assert_eq!(
-    r.unwrap(),
-    Flags {
-      subcommand: DenoSubcommand::Upgrade(UpgradeFlags {
-        force: false,
-        dry_run: false,
-        canary: false,
-        no_delta: true,
-        release_candidate: false,
-        version: None,
-        output: None,
-        version_or_hash_or_channel: None,
-        checksum: None,
-        pr: None,
-        branch: None,
-      }),
-      ..Flags::default()
-    }
   );
 }
 

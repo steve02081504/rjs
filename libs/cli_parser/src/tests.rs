@@ -501,24 +501,20 @@ const TEST_ARGS: &[ArgDef] = &[
 const UPGRADE_ARGS: &[ArgDef] = &[
   ArgDef::new("dry-run").long("dry-run").set_true(),
   ArgDef::new("force").short('f').long("force").set_true(),
-  ArgDef::new("canary").long("canary").set_true(),
-  ArgDef::new("release-candidate")
-    .long("release-candidate")
-    .long_aliases(&["rc"])
-    .set_true(),
-  ArgDef::new("version")
-    .long("version")
-    .action(ArgAction::Set)
-    .num_args(NumArgs::Exact(1)),
   ArgDef::new("output")
     .short('o')
     .long("output")
     .action(ArgAction::Set)
     .num_args(NumArgs::Exact(1)),
-  ArgDef::new("version-or-hash-or-channel")
-    .positional()
+  ArgDef::new("cert")
+    .long("cert")
     .action(ArgAction::Set)
-    .num_args(NumArgs::Optional),
+    .num_args(NumArgs::Exact(1)),
+  ArgDef::new("unsafely-ignore-certificate-errors")
+    .long("unsafely-ignore-certificate-errors")
+    .action(ArgAction::Append)
+    .num_args(NumArgs::ZeroOrMore)
+    .value_delimiter(','),
 ];
 
 const LINT_ARGS: &[ArgDef] = &[
@@ -772,7 +768,7 @@ static TEST_ROOT: CommandDef = CommandDef {
     },
     CommandDef {
       name: "upgrade",
-      about: "Upgrade deno executable",
+      about: "Upgrade rjs to the latest build",
       aliases: &[],
       args: UPGRADE_ARGS,
       arg_groups: &[],
@@ -950,13 +946,6 @@ fn upgrade_subcommand() {
   assert_eq!(r.subcommand.as_deref(), Some("upgrade"));
   assert!(r.get_bool("dry-run"));
   assert!(r.get_bool("force"));
-}
-
-#[test]
-fn upgrade_with_positional() {
-  let r = parse(&TEST_ROOT, &svec!["deno", "upgrade", "canary"]).unwrap();
-  assert_eq!(r.subcommand.as_deref(), Some("upgrade"));
-  assert_eq!(r.get_one("version-or-hash-or-channel"), Some("canary"));
 }
 
 #[test]
@@ -1237,16 +1226,6 @@ fn eval_double_dash_before_code_keeps_second_separator() {
 }
 
 #[test]
-fn upgrade_double_dash_stays_trailing() {
-  // Commands without trailing var args don't enter positional-only mode:
-  // `--` still starts (unused) trailing args, as before.
-  let r =
-    parse(&TEST_ROOT, &svec!["deno", "upgrade", "--", "v1", "v2"]).unwrap();
-  assert_eq!(r.get_one("version-or-hash-or-channel"), None);
-  assert_eq!(r.trailing, vec!["v1", "v2"]);
-}
-
-#[test]
 fn test_double_dash_stays_trailing() {
   // Commands with a multi-value positional (test/bench) mirror clap's
   // `.last(true)`: args after `--` are script args, not files.
@@ -1345,12 +1324,6 @@ fn combined_short_flags() {
   assert!(r.get_bool("allow-write"));
   assert!(r.get_bool("allow-net"));
   assert!(r.get_bool("allow-env"));
-}
-
-#[test]
-fn upgrade_alias() {
-  let r = parse(&TEST_ROOT, &svec!["deno", "upgrade", "--rc"]).unwrap();
-  assert!(r.get_bool("release-candidate"));
 }
 
 #[test]
