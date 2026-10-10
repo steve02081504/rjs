@@ -163,14 +163,15 @@ jobs:
           # Release profile is panic=abort, so the unwind sections are dead weight;
           # this is upstream's strip recipe for the release binaries. `rjsrt` is the
           # runtime `rjs compile` downloads at run time, so it ships the same way.
+          #
+          # Only the sections are asserted. A plain `cargo build` (upstream's release
+          # jobs build std from a sysroot with `-Zbuild-std`, which never emits one)
+          # keeps a PT_GNU_EH_FRAME *program header* even after the section it points
+          # at is stripped; it is an inert entry the dynamic loader ignores.
           for name in rjs rjsrt; do
             strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr "target/release/$name"
             if readelf -SW "target/release/$name" | grep -Eq '\.eh_frame(_hdr)?'; then
               echo "unwind sections remain in $name" >&2
-              exit 1
-            fi
-            if readelf -lW "target/release/$name" | grep -q GNU_EH_FRAME; then
-              echo "PT_GNU_EH_FRAME remains in $name" >&2
               exit 1
             fi
           done
@@ -225,7 +226,7 @@ jobs:
           # `rjsrt` is a standalone-app runtime and cannot be executed on its own: it
           # has no embedded VFS section, so `extract_standalone` (cli/rt/binary.rs)
           # fails and it exits non-zero for any argv, `-V` included. Check instead
-          # that the pre-strip artifact is a present, non-empty, executable file.
+          # that the packaged artifact is a present, non-empty, executable file.
           if [ ! -s "$rjsrt_binary" ]; then
             echo "$rjsrt_binary is missing or empty" >&2
             exit 1
