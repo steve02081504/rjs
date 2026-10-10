@@ -278,9 +278,11 @@ async fn find_latest_version_to_upgrade(
   let latest_version = match fetch_latest_version(client).await {
     Ok(version) => version,
     Err(err) => {
-      // The version file for a target only exists once a build for that
-      // target has been published.
-      if err.to_string().to_lowercase().contains("not found") {
+      // The version file for a target only exists once a build for that target
+      // has been published. `download_text` wraps the response status in a
+      // context, so the whole chain has to be inspected, not the top message.
+      let chain = format!("{err:#}").to_lowercase();
+      if chain.contains("not found") || chain.contains("404") {
         bail!(
           "No rjs build is available for {} at the moment.",
           env!("TARGET")
