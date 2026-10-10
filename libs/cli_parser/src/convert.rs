@@ -434,7 +434,7 @@ fn default_parse(
     if has_run_flags && !has_v8_help {
       return Err(CliError::new(
         CliErrorKind::MissingRequired,
-        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `deno repl` subcommand\n\nUsage: deno [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
+        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `rjs repl` subcommand\n\nUsage: rjs [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
       ));
     }
 
@@ -1777,75 +1777,10 @@ fn upgrade_parse(
   ca_file_arg_parse(result, flags);
   unsafely_ignore_certificate_errors_parse(result, flags);
 
-  let dry_run = result.get_bool("dry-run");
-  let force = result.get_bool("force");
-  let canary = result.get_bool("canary");
-  let release_candidate = result.get_bool("release-candidate");
-  let version = result.get_one("version").map(|s| s.to_string());
-  let output = result.get_one("output").map(|s| s.to_string());
-  let checksum = result.get_one("checksum").map(|s| s.to_string());
-
-  let positional = result
-    .get_one("version-or-hash-or-channel")
-    .map(|s| s.to_string());
-
-  // Handle "pr <number>" and "compass" special positional patterns
-  let pr_number_positional = result
-    .get_one("pr-number-positional")
-    .map(|s| s.to_string());
-
-  let (version_or_hash_or_channel, pr, branch) =
-    if positional.as_deref() == Some("pr") {
-      // "deno upgrade pr <number>" - second positional is the PR number
-      let pr_str = pr_number_positional
-        .as_deref()
-        .or_else(|| result.get_one("pr"));
-      match pr_str {
-        None => {
-          return Err(CliError::new(
-            CliErrorKind::MissingRequired,
-            "missing PR number for 'deno upgrade pr'",
-          ));
-        }
-        Some(s) => {
-          let s = s.strip_prefix('#').unwrap_or(s);
-          match s.parse::<u64>() {
-            Ok(n) => (None, Some(n), None),
-            Err(_) => {
-              return Err(CliError::new(
-                CliErrorKind::InvalidValue,
-                format!("invalid PR number: '{s}'"),
-              ));
-            }
-          }
-        }
-      }
-    } else if positional.as_deref() == Some("compass") {
-      (None, None, Some("compass".to_string()))
-    } else {
-      let pr_flag = result.get_one("pr").and_then(|s| s.parse::<u64>().ok());
-      let branch_flag = result.get_one("branch").map(|s| s.to_string());
-      if pr_flag.is_some() {
-        (None, pr_flag, None)
-      } else if branch_flag.is_some() {
-        (None, None, branch_flag)
-      } else {
-        (positional, None, None)
-      }
-    };
-
   flags.subcommand = DenoSubcommand::Upgrade(UpgradeFlags {
-    dry_run,
-    force,
-    release_candidate,
-    canary,
-    version,
-    output,
-    version_or_hash_or_channel,
-    checksum,
-    pr,
-    branch,
-    no_delta: result.get_bool("no-delta"),
+    dry_run: result.get_bool("dry-run"),
+    force: result.get_bool("force"),
+    output: result.get_one("output").map(|s| s.to_string()),
   });
   Ok(())
 }

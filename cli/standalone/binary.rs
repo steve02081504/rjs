@@ -26,7 +26,6 @@ use deno_core::url::Url;
 use deno_graph::ModuleGraph;
 use deno_lib::args::CaData;
 use deno_lib::args::UnstableConfig;
-use deno_lib::shared::ReleaseChannel;
 use deno_lib::standalone::binary::CjsExportAnalysisEntry;
 use deno_lib::standalone::binary::MAGIC_BYTES;
 use deno_lib::standalone::binary::Metadata;
@@ -465,32 +464,24 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     if let Some(path) = get_dev_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {
         log::warn!(
-          "--engine quickjs is ignored when using the development denort at {}",
+          "--engine quickjs is ignored when using the development rjsrt at {}",
           path.to_string_lossy()
         );
       }
-      log::debug!("Resolved denort: {}", path.to_string_lossy());
+      log::debug!("Resolved rjsrt: {}", path.to_string_lossy());
       return std::fs::read(&path).with_context(|| {
-        format!("Could not find denort at '{}'", path.to_string_lossy())
+        format!("Could not find rjsrt at '{}'", path.to_string_lossy())
       });
     }
 
     let target = resolve_compile_target(compile_flags);
-    let binary_name =
-      runtime_archive_name("denort", &compile_flags.engine, &target);
-
-    let binary_path_suffix = match DENO_VERSION_INFO.release_channel {
-      ReleaseChannel::Canary => {
-        format!("canary/{}/{}", DENO_VERSION_INFO.git_hash, binary_name)
-      }
-      _ => {
-        format!("release/v{}/{}", DENO_VERSION_INFO.deno, binary_name)
-      }
-    };
+    let archive_name =
+      runtime_archive_name("rjsrt", &compile_flags.engine, &target);
+    let binary_path_suffix = release_asset_cache_suffix(&archive_name);
 
     let download_directory = self.deno_dir.dl_folder_path();
     let binary_path = download_directory.join(&binary_path_suffix);
-    log::debug!("Resolved denort: {}", binary_path.display());
+    log::debug!("Resolved rjsrt: {}", binary_path.display());
 
     let read_file = |path: &Path| -> Result<Vec<u8>, AnyError> {
       std::fs::read(path).with_context(|| format!("Reading {}", path.display()))
@@ -499,18 +490,18 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       read_file(&binary_path)?
     } else {
       self
-        .download_base_binary(&binary_path, &binary_path_suffix)
+        .download_base_binary(&binary_path, &archive_name)
         .await
         .context("Setting up base binary.")?
     };
     let temp_dir = tempfile::TempDir::new()?;
     let base_binary_path = archive::unpack_into_dir(archive::UnpackArgs {
       exe_name: if target.contains("windows") {
-        "denort.exe"
+        "rjsrt.exe"
       } else {
-        "denort"
+        "rjsrt"
       },
-      archive_name: &binary_name,
+      archive_name: &archive_name,
       archive_data: &archive_data,
       dest_path: temp_dir.path(),
     })?;
@@ -523,18 +514,18 @@ impl<'a> DenoCompileBinaryWriter<'a> {
     &self,
     compile_flags: &CompileFlags,
   ) -> Result<Vec<u8>, AnyError> {
-    // For development: check DENORT_DESKTOP_BIN env var or look
-    // for libdenort next to the deno executable.
+    // For development: check RJSRT_DESKTOP_BIN env var or look
+    // for librjsrt next to the rjs executable.
     if let Some(path) = get_dev_desktop_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {
         log::warn!(
-          "--engine quickjs is ignored when using the development libdenort at {}",
+          "--engine quickjs is ignored when using the development librjsrt at {}",
           path.to_string_lossy()
         );
       }
-      log::debug!("Resolved libdenort: {}", path.to_string_lossy());
+      log::debug!("Resolved librjsrt: {}", path.to_string_lossy());
       return std::fs::read(&path).with_context(|| {
-        format!("Could not find libdenort at '{}'", path.to_string_lossy())
+        format!("Could not find librjsrt at '{}'", path.to_string_lossy())
       });
     }
 
@@ -547,25 +538,17 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       "so"
     };
     let lib_name = if target.contains("windows") {
-      format!("denort.{lib_ext}")
+      format!("rjsrt.{lib_ext}")
     } else {
-      format!("libdenort.{lib_ext}")
+      format!("librjsrt.{lib_ext}")
     };
-    let binary_name =
-      runtime_archive_name("libdenort", &compile_flags.engine, &target);
-
-    let binary_path_suffix = match DENO_VERSION_INFO.release_channel {
-      ReleaseChannel::Canary => {
-        format!("canary/{}/{}", DENO_VERSION_INFO.git_hash, binary_name)
-      }
-      _ => {
-        format!("release/v{}/{}", DENO_VERSION_INFO.deno, binary_name)
-      }
-    };
+    let archive_name =
+      runtime_archive_name("librjsrt", &compile_flags.engine, &target);
+    let binary_path_suffix = release_asset_cache_suffix(&archive_name);
 
     let download_directory = self.deno_dir.dl_folder_path();
     let binary_path = download_directory.join(&binary_path_suffix);
-    log::debug!("Resolved libdenort: {}", binary_path.display());
+    log::debug!("Resolved librjsrt: {}", binary_path.display());
 
     let read_file = |path: &Path| -> Result<Vec<u8>, AnyError> {
       std::fs::read(path).with_context(|| format!("Reading {}", path.display()))
@@ -574,14 +557,14 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       read_file(&binary_path)?
     } else {
       self
-        .download_base_binary(&binary_path, &binary_path_suffix)
+        .download_base_binary(&binary_path, &archive_name)
         .await
         .context("Setting up desktop base binary.")?
     };
     let temp_dir = tempfile::TempDir::new()?;
     let base_binary_path = archive::unpack_into_dir(archive::UnpackArgs {
       exe_name: &lib_name,
-      archive_name: &binary_name,
+      archive_name: &archive_name,
       archive_data: &archive_data,
       dest_path: temp_dir.path(),
     })?;
@@ -593,9 +576,9 @@ impl<'a> DenoCompileBinaryWriter<'a> {
   async fn download_base_binary(
     &self,
     output_path: &Path,
-    binary_path_suffix: &str,
+    archive_name: &str,
   ) -> Result<Vec<u8>, AnyError> {
-    let download_url = format!("https://dl.deno.land/{binary_path_suffix}");
+    let download_url = format!("{RELEASE_DOWNLOAD_BASE}/{archive_name}");
     let response = {
       let progress_bars = ProgressBar::new(ProgressBarStyle::DownloadBars);
       let progress = progress_bars.update(&download_url);
@@ -1307,7 +1290,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
   /// reached: the rewriter recorded every absolute path it pointed at,
   /// and we map each path back to its owning npm package and walk that
   /// closure. The full resolution snapshot still goes in the metadata
-  /// so denort can resolve packages by name at runtime.
+  /// so rjsrt can resolve packages by name at runtime.
   fn fill_bundle_native_addon_vfs(
     &self,
     builder: &mut VfsBuilder,
@@ -1501,7 +1484,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         let global_cache_root_path = npm_resolver.global_cache_root_path();
 
         // Flatten all the registries folders into a single ".deno_compile_node_modules/localhost" folder
-        // that will be used by denort when loading the npm cache. This avoids us exposing
+        // that will be used by rjsrt when loading the npm cache. This avoids us exposing
         // the user's private registry information and means we don't have to bother
         // serializing all the different registry config into the binary.
         //
@@ -1775,14 +1758,14 @@ fn serialize_npm_snapshot(
   bytes
 }
 
-fn get_denort_path(deno_exe: PathBuf) -> Option<OsString> {
-  let mut denort = deno_exe;
-  denort.set_file_name(if cfg!(windows) {
-    "denort.exe"
+fn get_rjsrt_path(deno_exe: PathBuf) -> Option<OsString> {
+  let mut rjsrt = deno_exe;
+  rjsrt.set_file_name(if cfg!(windows) {
+    "rjsrt.exe"
   } else {
-    "denort"
+    "rjsrt"
   });
-  denort.exists().then(|| denort.into_os_string())
+  rjsrt.exists().then(|| rjsrt.into_os_string())
 }
 
 fn runtime_archive_name(
@@ -1793,14 +1776,26 @@ fn runtime_archive_name(
   format!("{prefix}{}-{target}.zip", engine.artifact_suffix())
 }
 
+/// Base URL of the rolling release every rjs build is published to.
+const RELEASE_DOWNLOAD_BASE: &str =
+  "https://github.com/steve02081504/rjs/releases/download/default";
+
+/// Where a release asset lives inside the local `dl` cache directory.
+///
+/// The sha of the build this binary came from namespaces the cache entry, so a
+/// cached runtime is only ever reused by the build that downloaded it.
+fn release_asset_cache_suffix(archive_name: &str) -> String {
+  format!("default/{}/{}", DENO_VERSION_INFO.deno, archive_name)
+}
+
 fn get_dev_binary_path() -> Option<OsString> {
-  env::var_os("DENORT_BIN").or_else(|| {
+  env::var_os("RJSRT_BIN").or_else(|| {
     env::current_exe().ok().and_then(|exec_path| {
       if exec_path
         .components()
         .any(|component| component == Component::Normal("target".as_ref()))
       {
-        get_denort_path(exec_path)
+        get_rjsrt_path(exec_path)
       } else {
         None
       }
@@ -1808,32 +1803,32 @@ fn get_dev_binary_path() -> Option<OsString> {
   })
 }
 
-fn get_libdenort_path(deno_exe: PathBuf) -> Option<OsString> {
-  let mut libdenort = deno_exe;
+fn get_librjsrt_path(deno_exe: PathBuf) -> Option<OsString> {
+  let mut librjsrt = deno_exe;
   if cfg!(target_os = "macos") {
-    libdenort.set_file_name("libdenort.dylib");
+    librjsrt.set_file_name("librjsrt.dylib");
   } else if cfg!(windows) {
-    libdenort.set_file_name("denort.dll");
+    librjsrt.set_file_name("rjsrt.dll");
   } else {
-    libdenort.set_file_name("libdenort.so");
+    librjsrt.set_file_name("librjsrt.so");
   }
-  libdenort.exists().then(|| libdenort.into_os_string())
+  librjsrt.exists().then(|| librjsrt.into_os_string())
 }
 
 fn get_dev_desktop_binary_path() -> Option<OsString> {
-  env::var_os("DENORT_DESKTOP_BIN").or_else(|| {
+  env::var_os("RJSRT_DESKTOP_BIN").or_else(|| {
     env::current_exe().ok().and_then(|exec_path| {
       if exec_path
         .components()
         .any(|component| component == Component::Normal("target".as_ref()))
       {
-        // Prefer release libdenort (optimized) over debug.
+        // Prefer the release librjsrt (optimized) over the debug one.
         let target_dir = exec_path.parent().and_then(|p| p.parent());
         target_dir
           .and_then(|d| {
-            get_libdenort_path(d.join("release").join("libdenort.dylib"))
+            get_librjsrt_path(d.join("release").join("librjsrt.dylib"))
           })
-          .or_else(|| get_libdenort_path(exec_path.clone()))
+          .or_else(|| get_librjsrt_path(exec_path.clone()))
       } else {
         None
       }
@@ -1908,16 +1903,16 @@ mod tests {
   fn runtime_archive_names_include_engine_suffix() {
     let target = "aarch64-apple-darwin";
     assert_eq!(
-      runtime_archive_name("denort", &JavaScriptEngine::V8, target),
-      "denort-aarch64-apple-darwin.zip"
+      runtime_archive_name("rjsrt", &JavaScriptEngine::V8, target),
+      "rjsrt-aarch64-apple-darwin.zip"
     );
     assert_eq!(
-      runtime_archive_name("denort", &JavaScriptEngine::QuickJs, target),
-      "denort-quickjs-aarch64-apple-darwin.zip"
+      runtime_archive_name("rjsrt", &JavaScriptEngine::QuickJs, target),
+      "rjsrt-quickjs-aarch64-apple-darwin.zip"
     );
     assert_eq!(
-      runtime_archive_name("libdenort", &JavaScriptEngine::QuickJs, target),
-      "libdenort-quickjs-aarch64-apple-darwin.zip"
+      runtime_archive_name("librjsrt", &JavaScriptEngine::QuickJs, target),
+      "librjsrt-quickjs-aarch64-apple-darwin.zip"
     );
   }
 

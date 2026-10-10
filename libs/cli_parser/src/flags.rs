@@ -700,15 +700,7 @@ pub struct TranspileFlags {
 pub struct UpgradeFlags {
   pub dry_run: bool,
   pub force: bool,
-  pub release_candidate: bool,
-  pub canary: bool,
-  pub no_delta: bool,
-  pub version: Option<String>,
   pub output: Option<String>,
-  pub version_or_hash_or_channel: Option<String>,
-  pub checksum: Option<String>,
-  pub pr: Option<u64>,
-  pub branch: Option<String>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

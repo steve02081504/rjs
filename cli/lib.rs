@@ -617,7 +617,7 @@ fn setup_panic_hook() {
       eprintln!(
         "\n============================================================"
       );
-      eprintln!("Deno could not start: unable to create worker threads.");
+      eprintln!("rjs could not start: unable to create worker threads.");
       eprintln!();
       eprintln!("This usually happens when running in a container with a low");
       eprintln!("PID limit. Try increasing the limit (e.g. --pids-limit=40).");
@@ -630,8 +630,8 @@ fn setup_panic_hook() {
     }
 
     eprintln!("\n============================================================");
-    eprintln!("Deno has panicked. This is a bug in Deno. Please report this");
-    eprintln!("at https://github.com/denoland/deno/issues/new.");
+    eprintln!("rjs has panicked. This is a bug in rjs. Please report this");
+    eprintln!("at https://github.com/steve02081504/rjs/issues/new.");
     eprintln!("If you can reliably reproduce this panic, include the");
     #[cfg(not(all(
       feature = "panic-trace-frame-pointer",
@@ -659,14 +659,6 @@ fn setup_panic_hook() {
     // Panic traces are not supported for custom/development builds.
     #[cfg(feature = "panic-trace")]
     {
-      let info = &deno_lib::version::DENO_VERSION_INFO;
-      let version =
-        if info.release_channel == deno_lib::shared::ReleaseChannel::Canary {
-          format!("{}+{}", deno_lib::version::DENO_VERSION, info.git_hash)
-        } else {
-          info.deno.to_string()
-        };
-
       #[cfg(all(
         feature = "panic-trace-frame-pointer",
         target_os = "linux",
@@ -679,13 +671,8 @@ fn setup_panic_hook() {
         any(target_arch = "x86_64", target_arch = "aarch64")
       )))]
       let trace = deno_panic::trace();
-      eprintln!("View stack trace at:");
-      eprintln!(
-        "https://panic.deno.com/v{}/{}/{}",
-        version,
-        env!("TARGET"),
-        trace
-      );
+      eprintln!("Stack trace:");
+      eprintln!("{trace}");
     }
 
     orig_hook(panic_info);

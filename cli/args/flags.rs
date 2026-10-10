@@ -8,7 +8,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use color_print::cstr;
 use deno_cli_parser::CliError;
 pub use deno_cli_parser::flags::*;
 use deno_config::glob::FilePatterns;
@@ -34,26 +33,6 @@ use crate::util::fs::canonicalize_path;
 // deno_telemetry / the cli build env, which the parser crate intentionally
 // does not.
 // ---------------------------------------------------------------------------
-
-pub static UPGRADE_USAGE: &str = cstr!(
-  "<g>Latest</>
-  <bold>deno upgrade</>
-
-<g>Specific version</>
-  <bold>deno upgrade</> <p(245)>1.45.0</>
-  <bold>deno upgrade</> <p(245)>1.46.0-rc.1</>
-  <bold>deno upgrade</> <p(245)>9bc2dd29ad6ba334fd57a20114e367d3c04763d4</>
-
-<g>Channel</>
-  <bold>deno upgrade</> <p(245)>stable</>
-  <bold>deno upgrade</> <p(245)>alpha</>
-  <bold>deno upgrade</> <p(245)>beta</>
-  <bold>deno upgrade</> <p(245)>rc</>
-  <bold>deno upgrade</> <p(245)>canary</>
-
-<g>From a pull request</> <p(245)>(requires gh CLI)</>
-  <bold>deno upgrade</> <p(245)>pr 12345</>"
-);
 
 fn join_paths(allowlist: &[String], d: &str) -> String {
   allowlist
@@ -760,7 +739,7 @@ pub fn render_version(long: bool) -> String {
   if long {
     debug_assert_eq!(DENO_VERSION_INFO.typescript, deno_snapshots::TS_VERSION);
     format!(
-      "deno {} ({}, {}, {})\nv8 {}\ntypescript {}\n",
+      "rjs {} ({}, {}, {})\nv8 {}\ntypescript {}\n",
       DENO_VERSION_INFO.deno,
       DENO_VERSION_INFO.release_channel.name(),
       env!("PROFILE"),
@@ -769,7 +748,7 @@ pub fn render_version(long: bool) -> String {
       DENO_VERSION_INFO.typescript,
     )
   } else {
-    format!("deno {}\n", DENO_VERSION_INFO.deno)
+    format!("rjs {}\n", DENO_VERSION_INFO.deno)
   }
 }
 

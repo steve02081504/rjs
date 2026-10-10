@@ -234,7 +234,7 @@ pub static COMPILE_ARGS: &[ArgDef] = &[
     .long("config")
     .action(ArgAction::Set)
     .num_args(NumArgs::Exact(1))
-.help("Configure different aspects of deno including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
+.help("Configure different aspects of rjs including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
   ArgDef::new("no-config")
     .long("no-config")
     .set_true()
@@ -615,7 +615,7 @@ static RUN_ARGS: &[ArgDef] = &[
     .action(ArgAction::Set)
     .num_args(NumArgs::Optional)
     .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
   ArgDef::new("watch")
     .long("watch")
     .action(ArgAction::Append)
@@ -761,7 +761,7 @@ pub static SERVE_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("watch")
       .long("watch")
       .action(ArgAction::Append)
@@ -853,7 +853,7 @@ pub static EVAL_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
   ],
   arg_groups: &[
     UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS,
@@ -978,7 +978,7 @@ pub static FMT_SUBCOMMAND: CommandDef = CommandDef {
       .long("config")
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
-.help("Configure different aspects of deno including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
+.help("Configure different aspects of rjs including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
     ArgDef::new("no-config").long("no-config").set_true()
 .help("Disable automatic loading of the configuration file"),
     ArgDef::new("no-editorconfig")
@@ -1093,7 +1093,7 @@ pub static LINT_SUBCOMMAND: CommandDef = CommandDef {
       .long("config")
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
-.help("Configure different aspects of deno including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
+.help("Configure different aspects of rjs including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
     ArgDef::new("no-config").long("no-config").set_true()
 .help("Disable automatic loading of the configuration file"),
     ArgDef::new("ext")
@@ -1101,7 +1101,7 @@ pub static LINT_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
       .value_parser(ValueParser::Choices(EXECUTABLE_EXTS))
-.help("Specify the file extension to lint when reading from stdin.For example, use `jsx` to lint JSX files or `tsx` for TSX files.This argument is necessary because stdin input does not automatically infer the file type.Example usage: `cat file.jsx | deno lint - --ext=jsx`."),
+.help("Specify the file extension to lint when reading from stdin.For example, use `jsx` to lint JSX files or `tsx` for TSX files.This argument is necessary because stdin input does not automatically infer the file type.Example usage: `cat file.jsx | rjs lint - --ext=jsx`."),
     ArgDef::new("allow-import")
       .short('I')
       .long("allow-import")
@@ -1150,7 +1150,7 @@ pub static TEST_SUBCOMMAND: CommandDef = CommandDef {
       .conflicts_with(&["inspect", "inspect-brk", "inspect-wait"])
 .help("Collect coverage profile data into DIR. If DIR is not specified, it uses 'coverage/'.\n  This option can also be set via the DENO_COVERAGE_DIR environment variable."),
     ArgDef::new("clean").long("clean").set_true()
-.help("Empty the temporary coverage profile data directory before running tests.\n  Note: running multiple `deno test --clean` calls in series or parallel for the same coverage directory may cause race conditions."),
+.help("Empty the temporary coverage profile data directory before running tests.\n  Note: running multiple `rjs test --clean` calls in series or parallel for the same coverage directory may cause race conditions."),
     ArgDef::new("fail-fast")
       .long("fail-fast")
       .action(ArgAction::Set)
@@ -1295,7 +1295,7 @@ pub static TEST_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
   ],
   arg_groups: &[
     UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS,
@@ -1314,26 +1314,13 @@ pub static TEST_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static UPGRADE_SUBCOMMAND: CommandDef = CommandDef {
   name: "upgrade",
-  about: "Upgrade deno executable to given version",
+  about: "Upgrade rjs to the latest build",
   aliases: &[],
   args: &[
     ArgDef::new("dry-run").long("dry-run").set_true()
 .help("Perform all checks without replacing old exe"),
     ArgDef::new("force").short('f').long("force").set_true()
 .help("Replace current exe even if not out-of-date"),
-    ArgDef::new("canary").long("canary").set_true()
-.help("Upgrade to canary builds"),
-    ArgDef::new("release-candidate")
-      .long("release-candidate")
-      .long_aliases(&["rc"])
-      .set_true()
-      .conflicts_with(&["canary", "version"])
-.help("Upgrade to a release candidate"),
-    ArgDef::new("version")
-      .long("version")
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1))
-.help("The version to upgrade to"),
     ArgDef::new("output")
       .short('o')
       .long("output")
@@ -1351,30 +1338,6 @@ pub static UPGRADE_SUBCOMMAND: CommandDef = CommandDef {
       .num_args(NumArgs::ZeroOrMore)
       .value_delimiter(',')
 .help("DANGER: Disables verification of TLS certificates"),
-    ArgDef::new("version-or-hash-or-channel")
-      .positional()
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1))
-.help("Version (v1.46.0), channel (alpha, beta, rc, canary), commit hash (9bc2dd29ad6ba334fd57a20114e367d3c04763d4), or pr 12345 to install from a PR"),
-    ArgDef::new("pr-number-positional")
-      .positional()
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Optional),
-    ArgDef::new("pr")
-      .long("pr")
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1)),
-    ArgDef::new("checksum")
-      .long("checksum")
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1))
-.help("Verify the downloaded archive against the provided SHA256 checksum"),
-    ArgDef::new("branch")
-      .long("branch")
-      .action(ArgAction::Set)
-      .num_args(NumArgs::Exact(1)),
-    ArgDef::new("no-delta").long("no-delta").set_true()
-.help("Disable delta updates and always download the full archive"),
   ],
   arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
   subcommands: &[],
@@ -1398,7 +1361,7 @@ pub static CACHE_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("ext")
       .long("ext")
       .action(ArgAction::Set)
@@ -1455,7 +1418,7 @@ pub static CHECK_SUBCOMMAND: CommandDef = CommandDef {
     ArgDef::new("check-js").long("check-js").set_true().hidden()
 .help("Enable type-checking of JavaScript files (equivalent to `compilerOptions.checkJs: true`)"),
     ArgDef::new("desktop").long("desktop").set_true()
-.help("Type-check using the type definitions for `deno desktop`"),
+.help("Type-check using the type definitions for `rjs desktop`"),
     ArgDef::new("no-code-cache")
       .long("no-code-cache")
       .set_true()
@@ -1607,7 +1570,7 @@ pub static TASK_SUBCOMMAND: CommandDef = CommandDef {
       .long("config")
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
-.help("Configure different aspects of deno including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
+.help("Configure different aspects of rjs including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
     ArgDef::new("recursive")
       .short('r')
       .long("recursive")
@@ -1735,7 +1698,7 @@ pub static BENCH_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("ext")
       .long("ext")
       .action(ArgAction::Set)
@@ -1845,7 +1808,7 @@ pub static COMPILE_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("watch")
       .long("watch")
       .action(ArgAction::Append)
@@ -2110,7 +2073,7 @@ pub static INSTALL_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
   ],
   arg_groups: &[
     UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS,
@@ -2193,7 +2156,7 @@ pub static COMPLETIONS_SUBCOMMAND: CommandDef = CommandDef {
         "fig",
       ])),
     ArgDef::new("dynamic").long("dynamic").set_true()
-.help("Generate dynamic completions for the given shell (unstable), currently this only provides available tasks for `deno task`."),
+.help("Generate dynamic completions for the given shell (unstable), currently this only provides available tasks for `rjs task`."),
   ],
   arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
   subcommands: &[],
@@ -2221,7 +2184,7 @@ pub static INIT_SUBCOMMAND: CommandDef = CommandDef {
       .long("serve")
       .set_true()
       .conflicts_with(&["lib"])
-      .help("Generate an example project for `deno serve`"),
+      .help("Generate an example project for `rjs serve`"),
     ArgDef::new("npm")
       .long("npm")
       .set_true()
@@ -2288,7 +2251,7 @@ pub static CREATE_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static JUPYTER_SUBCOMMAND: CommandDef = CommandDef {
   name: "jupyter",
-  about: "Deno kernel for Jupyter notebooks",
+  about: "rjs kernel for Jupyter notebooks",
   aliases: &[],
   args: &[
     ArgDef::new("install")
@@ -2302,14 +2265,14 @@ pub static JUPYTER_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
       .conflicts_with(&["kernel"])
-.help("Set a name for the kernel (defaults to 'deno'). Useful when maintaing multiple Deno kernels."),
+.help("Set a name for the kernel (defaults to 'rjs'). Useful when maintaing multiple rjs kernels."),
     ArgDef::new("display")
       .short('d')
       .long("display")
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
       .requires(&["install"])
-.help("Set a display name for the kernel (defaults to 'Deno'). Useful when maintaing multiple Deno kernels."),
+.help("Set a display name for the kernel (defaults to 'rjs'). Useful when maintaing multiple rjs kernels."),
     ArgDef::new("kernel")
       .long("kernel")
       .set_true()
@@ -2370,7 +2333,7 @@ pub static PUBLISH_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("env-file")
       .long("env-file")
       .long_aliases(&["env"])
@@ -2738,7 +2701,7 @@ pub static LSP_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static VENDOR_SUBCOMMAND: CommandDef = CommandDef {
   name: "vendor",
-  about: "`deno vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
+  about: "`rjs vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
   aliases: &[],
   args: &[
     ArgDef::new("help")
@@ -2841,7 +2804,7 @@ pub static BUNDLE_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
   ],
   arg_groups: &[
     COMPILE_ARGS,
@@ -2940,13 +2903,13 @@ pub static X_SUBCOMMAND: CommandDef = CommandDef {
       .num_args(NumArgs::Optional)
       .default_value("dx")
       .conflicts_with(&["script_arg"])
-.help("Creates a dx alias so you can run dx <command> instead of deno x <command>"),
+.help("Creates a dx alias so you can run dx <command> instead of rjs x <command>"),
     ArgDef::new("check")
       .long("check")
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Enable type-checking. This subcommand does not type-check by default; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("env-file")
       .long("env-file")
       .action(ArgAction::Append)
@@ -3057,7 +3020,7 @@ pub static DESKTOP_SUBCOMMAND: CommandDef = CommandDef {
       .action(ArgAction::Set)
       .num_args(NumArgs::Optional)
       .require_equals()
-.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'deno check' subcommand."),
+.help("Set type-checking behavior. This subcommand type-checks local modules by default, so passing --check is redundant; pass --check=all to also type-check remote modules. Alternatively, use the 'rjs check' subcommand."),
     ArgDef::new("inspect-renderer")
       .long("inspect-renderer")
       .action(ArgAction::Set)
@@ -3200,7 +3163,7 @@ pub static PACK_SUBCOMMAND: CommandDef = CommandDef {
       .long("config")
       .action(ArgAction::Set)
       .num_args(NumArgs::Exact(1))
-.help("Configure different aspects of deno including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
+.help("Configure different aspects of rjs including TypeScript, linting, and code formatting.\n  Typically the configuration file will be called `deno.json` or `deno.jsonc` and\n  automatically detected; in that case this flag is not necessary.\n  Docs: https://docs.deno.com/go/config"),
     ArgDef::new("no-config")
       .long("no-config")
       .set_true()
@@ -3458,7 +3421,7 @@ pub static SYNC_TYPES_SUBCOMMAND: CommandDef = CommandDef {
 };
 
 pub static DENO_ROOT: CommandDef = CommandDef {
-  name: "deno",
+  name: "rjs",
   about: "A modern JavaScript and TypeScript runtime",
   aliases: &[],
   args: GLOBAL_ARGS,

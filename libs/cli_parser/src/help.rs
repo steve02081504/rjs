@@ -16,10 +16,10 @@ pub fn render_help(cmd: &CommandDef) -> String {
   }
 
   // Usage line
-  if cmd.name == "deno" {
+  if cmd.name == "rjs" {
     out.push_str(&format!("Usage: {} [OPTIONS]", cmd.name));
   } else {
-    out.push_str(&format!("Usage: deno {} [OPTIONS]", cmd.name));
+    out.push_str(&format!("Usage: rjs {} [OPTIONS]", cmd.name));
   }
 
   let positionals: Vec<&ArgDef> =
