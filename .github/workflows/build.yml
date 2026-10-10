@@ -102,17 +102,21 @@ jobs:
           rm ~/.curlrc || true
 
       - name: Install LLVM for macOS linking
-        if: runner.os == 'macOS'
+        # Only aarch64-apple-darwin asks the linker driver for lld; the Intel
+        # target just passes -Wl,-fixup_chains, which Apple's ld64 understands.
+        if: matrix.target == 'aarch64-apple-darwin'
         run: |
           set -euo pipefail
-          # `.cargo/config.toml` asks for `-fuse-ld=lld` (aarch64-apple-darwin) and
-          # `-Wl,-fixup_chains` (both darwin targets); upstream ships a prebuilt
-          # ld64.lld, which lived in the deleted tools/ directory. Homebrew's LLVM
-          # is keg-only, hence the explicit PATH entry.
-          brew install llvm || { brew update && brew install llvm; }
-          llvm_prefix="$(brew --prefix llvm)"
-          echo "$llvm_prefix/bin" >> "$GITHUB_PATH"
-          export PATH="$llvm_prefix/bin:$PATH"
+          # `.cargo/config.toml` asks for `-fuse-ld=lld` on aarch64-apple-darwin;
+          # upstream ships a prebuilt ld64.lld, which lived in the deleted tools/
+          # directory. Homebrew's LLVM 23 no longer contains lld at all — it moved
+          # to its own keg-only formula — so install both and put both on PATH.
+          brew install llvm lld || { brew update && brew install llvm lld; }
+          llvm_bin="$(brew --prefix llvm)/bin"
+          lld_bin="$(brew --prefix lld)/bin"
+          echo "$llvm_bin" >> "$GITHUB_PATH"
+          echo "$lld_bin" >> "$GITHUB_PATH"
+          export PATH="$lld_bin:$llvm_bin:$PATH"
           command -v ld64.lld
           ld64.lld --version
           version="$(ld64.lld --version | grep -oE '[0-9]+' | head -n1)"
