@@ -4,6 +4,11 @@
 *.symcache
 .env
 
+# Dependency lock files are not tracked: every build resolves its own.
+Cargo.lock
+deno.lock
+deno.lock.json
+
 /.cargo_home/
 /.idea/
 /.vs/

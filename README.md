@@ -66,6 +66,8 @@ Build from source with the pinned toolchain (`rust-toolchain.toml`):
 cargo build --release --bin rjs
 ```
 
+No dependency lock file is tracked here, so every build resolves its own dependency versions instead of pinning them.
+
 [`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push to `master` and builds `rjs` (plus the `rjsrt` runtime that `rjs compile` needs) for `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin` and `x86_64-pc-windows-msvc`. The results are published as assets of the rolling [`default` release](https://github.com/steve02081504/rjs/releases/tag/default); every run overwrites the assets in place, so that release always holds the newest build and nothing else.
 
 `rjs upgrade` reads `rjs-<target>.txt` from that release, compares the sha in it with the sha of the binary it is running, and replaces itself with `rjs-<target>.zip` when they differ. That is the whole update story — there is no stable/canary split and no version to pin.
