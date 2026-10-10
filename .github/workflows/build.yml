@@ -61,10 +61,6 @@ jobs:
             runner: windows-2022
     env:
       RJS_TARGET: ${{ matrix.target }}
-      # Upstream sets this for release builds: the lazy extension sources that
-      # end up in the snapshot get minified, which is a large part of the final
-      # binary size.
-      DENO_SNAPSHOT_MINIFY_SOURCES: "1"
     steps:
       - name: Configure git
         run: |
@@ -140,13 +136,25 @@ jobs:
           # The v8 crate downloads a prebuilt static library from GitHub; the token
           # keeps the anonymous API/download rate limit from failing the build.
           GITHUB_TOKEN: ${{ github.token }}
-        # One invocation for both bins: they share almost every dependency, so a
-        # second `cargo build` would only re-resolve dependencies.
-        #
         # No `--locked`: this repository does not track `Cargo.lock` (it is
         # gitignored), so every build resolves the dependency graph on its own and
         # builds are not reproducible by design.
-        run: cargo build --release --bin rjs --bin rjsrt
+        #
+        # Two passes. `DENO_SNAPSHOT_MINIFY_SOURCES` makes the snapshot build
+        # minify the lazy sources, and that minifier is a JS script the build runs
+        # through the CLI itself (`runtime/transpile.rs` spawns `rjs run -A`).
+        # Upstream's CI installed a released Deno for that; here the first pass
+        # builds the CLI and the second one uses it, so the tree needs nothing
+        # from outside to produce a minified snapshot.
+        run: |
+          set -euo pipefail
+          cargo build --release --bin rjs
+          # The pass-1 binary is the minifier host, so it has to run before it is
+          # handed to the snapshot build.
+          "$PWD/target/release/rjs" --version
+          export DENO_SNAPSHOT_MINIFY_SOURCES=1
+          export PATH="$PWD/target/release:$PATH"
+          cargo build --release --bin rjs --bin rjsrt
 
       - name: Package release (Linux)
         if: runner.os == 'Linux'
