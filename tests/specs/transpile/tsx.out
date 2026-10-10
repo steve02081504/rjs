@@ -1,3 +1,0 @@
-[WILDCARD]deno transpile is experimental and subject to changes
-const element = /*#__PURE__*/ React.createElement("div", null, "Hello");
-export default element;

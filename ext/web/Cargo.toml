@@ -32,21 +32,4 @@ uuid = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
 approx = "0.5.1"
-deno_bench_util.workspace = true
 deno_webidl.workspace = true
-
-[[bench]]
-name = "encoding"
-harness = false
-
-[[bench]]
-name = "timers_ops"
-harness = false
-
-[[bench]]
-name = "url_ops"
-harness = false
-
-[[bench]]
-name = "text_decoder_stream"
-harness = false

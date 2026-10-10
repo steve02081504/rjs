@@ -1,4 +1,0 @@
-{
-  "args": "doc --json mod.ts",
-  "output": "expected.out"
-}

@@ -15,10 +15,3 @@ path = "lib.rs"
 
 [dependencies]
 deno_core.workspace = true
-
-[dev-dependencies]
-deno_bench_util.workspace = true
-
-[[bench]]
-name = "dict"
-harness = false

@@ -62,4 +62,3 @@ windows-sys = { workspace = true, features = ["Win32_Foundation"] }
 
 [dev-dependencies]
 sys_traits = { workspace = true, features = ["memory", "real", "serde_json"] }
-test_util.workspace = true

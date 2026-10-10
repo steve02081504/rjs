@@ -1,3 +1,0 @@
-export const snapshot = {};
-
-snapshot[`other 1`] = `x`;

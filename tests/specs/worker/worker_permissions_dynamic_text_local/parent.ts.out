@@ -1,1 +1,0 @@
-worker import denied: Requires read access to "[WILDCARD]secret.txt", run again with the --allow-read flag

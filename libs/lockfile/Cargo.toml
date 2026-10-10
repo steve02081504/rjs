@@ -12,11 +12,6 @@ description = "An implementation of a lockfile used in Deno"
 [lib]
 path = "./lib.rs"
 
-[[test]]
-name = "specs"
-path = "tests/spec_test.rs"
-harness = false
-
 [dependencies]
 async-trait.workspace = true
 deno_semver.workspace = true

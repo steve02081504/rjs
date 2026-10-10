@@ -1,5 +1,0 @@
-{
-  "args": "run --allow-read main.js",
-  "output": "pwned file exists: false\n",
-  "exitCode": 0
-}

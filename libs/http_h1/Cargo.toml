@@ -20,7 +20,3 @@ tokio = { workspace = true, features = ["io-util", "macros", "net", "rt", "time"
 
 [dev-dependencies]
 criterion.workspace = true
-
-[[bench]]
-name = "h1"
-harness = false

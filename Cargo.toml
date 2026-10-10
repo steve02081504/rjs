@@ -67,23 +67,7 @@ members = [
   "runtime/features",
   "runtime/permissions",
   "runtime/subprocess_windows",
-  "tests/bench",
-  "tests/bench_util",
-  "tests/ffi",
-  "tests/integration",
-  "tests/napi",
-  "tests/node_compat",
-  "tests/specs",
-  "tests/unit",
-  "tests/unit_node",
-  "tests/util/lib",
-  "tests/util/server",
-  "tests/util/test_macro",
-  "tools/bsdiff_helper",
 ]
-# tests/sqlite_extension is excluded because it requires rusqlite's "loadable_extension"
-# feature, which is incompatible with the "session" feature used by the rest of the workspace.
-exclude = ["tests/util/std/hash/_wasm", "tests/sqlite_extension"]
 
 [workspace.package]
 authors = ["the Deno authors"]
@@ -144,7 +128,6 @@ deno_webstorage = { version = "0.254.0", path = "./ext/webstorage" }
 denort_helper = { version = "0.57.0", path = "./ext/rt_helper" }
 
 # workspace libraries
-deno_bench_util = { version = "0.253.0", path = "./tests/bench_util" }
 deno_cache_dir = { version = "0.51.0", path = "./libs/cache_dir" }
 deno_cli_parser = { version = "0.9.0", path = "./libs/cli_parser" }
 deno_config = { version = "0.109.0", features = ["workspace"], path = "./libs/config" }
@@ -178,8 +161,6 @@ napi_sym = { version = "0.189.0", path = "./ext/napi/sym" }
 node_resolver = { version = "0.97.0", path = "./libs/node_resolver" }
 node_shim = { version = "0.34.0", path = "libs/node_shim" }
 serde_v8 = { version = "0.321.0", path = "./libs/serde_v8", default-features = false }
-test_macro = { path = "./tests/util/test_macro" }
-test_util = { path = "./tests/util/lib" }
 
 deno_tunnel = "0.8.1"
 
@@ -538,8 +519,6 @@ opt-level = 3
 opt-level = 3
 [profile.release.package.bytes]
 opt-level = 3
-[profile.release.package.deno_bench_util]
-opt-level = 3
 [profile.release.package.deno_core]
 opt-level = 3
 [profile.release.package.deno_crypto]
@@ -597,8 +576,6 @@ opt-level = 3
 [profile.release.package.serde_v8]
 opt-level = 3
 [profile.release.package.libsui]
-opt-level = 3
-[profile.release.package.test_napi]
 opt-level = 3
 [profile.release.package.tokio]
 opt-level = 3

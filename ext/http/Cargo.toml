@@ -18,10 +18,6 @@ default_property_extractor = []
 [lib]
 path = "lib.rs"
 
-[[bench]]
-name = "compressible"
-harness = false
-
 [dependencies]
 async-compression = { workspace = true, features = ["tokio", "brotli", "gzip"] }
 async-trait.workspace = true

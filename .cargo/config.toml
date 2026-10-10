@@ -35,8 +35,8 @@ rustflags = [
 # instead of the legacy LC_DYLD_INFO_ONLY rebase/bind opcode stream. dyld applies
 # chained fixups lazily per-page instead of eagerly walking every relocation at
 # launch, cutting pre-main startup (~0.8ms on the ~116MB binary). Requires a
-# macOS 12 deployment target (older dyld can't parse the format) and the bundled
-# ld64.lld bumped to LLD 20 (LLD 17 segfaults on -fixup_chains; see tools/util.js).
+# macOS 12 deployment target (older dyld can't parse the format) and a linker
+# that emits chained fixups (LLD 20 or newer; LLD 17 segfaults on -fixup_chains).
 [env]
 MACOSX_DEPLOYMENT_TARGET = "12.0"
 

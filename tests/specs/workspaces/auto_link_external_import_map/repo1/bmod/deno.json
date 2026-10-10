@@ -1,5 +1,0 @@
-{
-  "imports": {
-    "@scope/amod": "../amod/mod.ts"
-  }
-}

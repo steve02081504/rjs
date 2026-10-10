@@ -105,9 +105,5 @@ windows-sys = { workspace = true, features = ["Win32_System_Console", "Win32_Sys
 [target.'cfg(unix)'.dependencies]
 nix.workspace = true
 
-[dev-dependencies]
-# Used in benchmark
-test_util.workspace = true
-
 [package.metadata.docs.rs]
 features = ["docsrs"]

@@ -1,5 +1,0 @@
-{
-  "tempDir": true,
-  "args": "doc --lint mod.ts",
-  "output": "mod.out"
-}

@@ -2,11 +2,11 @@
 #
 # 0. Check out these repositories as siblings:
 #
-#     - https://github.com/denoland/deno
+#     - https://github.com/steve02081504/rjs
 #     - https://github.com/denoland/deno_core
 #     - https://github.com/denoland/rusty_v8
 #
-# 1. From `deno`, run: cargo --config .cargo/local-build.toml build
+# 1. From the `rjs` repo, run: cargo --config .cargo/local-build.toml build
 
 [patch.crates-io]
 deno_core = { path = "../deno_core/core" }

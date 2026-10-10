@@ -1,6 +1,0 @@
-{
-  "compile": {
-    "include": ["data"],
-    "exclude": ["data/excluded.txt"]
-  }
-}

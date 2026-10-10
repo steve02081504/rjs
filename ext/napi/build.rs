@@ -13,7 +13,7 @@ fn main() {
     .join(symbols_file_name)
     .canonicalize()
     .expect(
-        "Missing symbols list! Generate using tools/napi/generate_symbols_lists.js",
+        "Missing symbols list! Regenerate it with tools/napi/generate_symbols_lists.js from the upstream denoland/deno tree",
     );
 
   println!("cargo:rustc-rerun-if-changed={}", symbols_path.display());

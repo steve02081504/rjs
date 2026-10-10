@@ -1,8 +1,0 @@
-{
-  "tests": {
-    "blob_structured_clone": {
-      "args": "run main.ts",
-      "output": "main.out"
-    }
-  }
-}

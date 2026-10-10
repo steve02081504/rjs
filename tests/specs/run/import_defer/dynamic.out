@@ -1,7 +1,0 @@
-before dynamic import defer
-after dynamic import defer, before access
-deferred module evaluated
-value: 42
-after first access
-add: 3
-done

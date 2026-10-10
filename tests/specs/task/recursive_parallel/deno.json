@@ -1,3 +1,0 @@
-{
-  "workspace": ["./apps/server", "./apps/web", "./packages/shared"]
-}

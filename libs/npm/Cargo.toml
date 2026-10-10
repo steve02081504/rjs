@@ -45,11 +45,3 @@ pretty_assertions.workspace = true
 reqwest.workspace = true
 sha2.workspace = true
 tokio = { workspace = true, features = ["full"] }
-
-[[bench]]
-name = "bench"
-harness = false
-
-[[bench]]
-name = "registry_json"
-harness = false

@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "add": "jsr:@denotest/add@1",
-    "subtract": "jsr:@denotest/subtract@1"
-  }
-}

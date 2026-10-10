@@ -56,11 +56,27 @@ rjs is not the successor project. If someone with more hands steps up, or if the
 
 What I build here is what fount needs: native clipboard and WebView APIs, a virtual file system, a `git:`-style import prefix, programmatic control over hot reload and the module and package caches, Termux support, a built-in synchronous await, an async `eval`, and so on — plus whatever turns out to be in the way. It is not an attempt to be everything to everybody. It is an opinionated runtime shaped by the code I run on it, and if that happens to be useful to you, good.
 
+## Building and releases
+
+rjs has no version numbers and no release channels. The commit sha *is* the version, and `rjs --version` prints the sha it was built from.
+
+Build from source with the pinned toolchain (`rust-toolchain.toml`):
+
+```sh
+cargo build --release --bin rjs
+```
+
+[`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push to `master` and builds `rjs` (plus the `rjsrt` runtime that `rjs compile` needs) for `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin` and `x86_64-pc-windows-msvc`. The results are published as assets of the rolling [`default` release](https://github.com/steve02081504/rjs/releases/tag/default); every run overwrites the assets in place, so that release always holds the newest build and nothing else.
+
+`rjs upgrade` reads `rjs-<target>.txt` from that release, compares the sha in it with the sha of the binary it is running, and replaces itself with `rjs-<target>.zip` when they differ. That is the whole update story — there is no stable/canary split and no version to pin.
+
+The tree carries only what building the runtime needs: the test suite, the developer tooling that used to live in `tools/`, the docs and the upstream CI are not here.
+
 ## Contributing
 
 Issues and pull requests are welcome. rjs is a personal fork, so I merge what makes the runtime better for the code that runs on it and I am not obliged to accept anything else — see the philosophy above, which is the whole review policy.
 
-Because this fork will diverge from Deno over time, Deno's documentation, test suite and contribution guide describe Deno, not rjs. [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) is still the reference for building from source and for the developer tooling in this tree.
+Because this fork will diverge from Deno over time, Deno's documentation, test suite and contribution guide describe Deno, not rjs. This tree does not carry a contribution guide of its own — the philosophy above is the whole review policy.
 
 ## Credits
 

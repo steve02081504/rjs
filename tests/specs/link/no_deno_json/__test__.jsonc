@@ -1,6 +1,0 @@
-{
-  "tempDir": true,
-  "args": "link ./empty",
-  "exitCode": 1,
-  "output": "error.out"
-}

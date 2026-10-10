@@ -1,5 +1,0 @@
-{
-  "name": "@scope/a",
-  "version": "0.0.0",
-  "exports": "./a_test.ts"
-}

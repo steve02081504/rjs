@@ -28,7 +28,3 @@ sys_traits = { workspace = true, features = ["real"] }
 [dev-dependencies]
 criterion.workspace = true
 pretty_assertions.workspace = true
-
-[[bench]]
-name = "parse"
-harness = false

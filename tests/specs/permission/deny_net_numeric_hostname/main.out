@@ -1,3 +1,0 @@
-PASS: direct 127.0.0.1 denied
-PASS: numeric 2130706433 denied
-PASS: hex 0x7f000001 denied

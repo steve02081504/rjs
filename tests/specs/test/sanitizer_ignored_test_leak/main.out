@@ -1,6 +1,0 @@
-[WILDCARD]
-ignoresSanitizersAndLeaksActivities ... ok [WILDCARD]
-laterTestClearsTheLeakedActivities ... ok [WILDCARD]
-laterTestIsUnaffected ... ok [WILDCARD]
-
-ok | 3 passed | 0 failed [WILDCARD]

@@ -1,1 +1,0 @@
-self.postMessage("outside worker");

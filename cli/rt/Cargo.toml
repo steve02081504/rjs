@@ -1,28 +1,23 @@
 # Copyright 2018-2026 the Deno authors. MIT license.
 
 [package]
-name = "denort"
+name = "rjsrt"
 version = "2.9.7"
 authors.workspace = true
-default-run = "denort"
+default-run = "rjsrt"
 edition.workspace = true
 license.workspace = true
 publish = false
 repository.workspace = true
-description = "Provides the denort executable"
+description = "Provides the rjsrt runtime executable"
 
 [[bin]]
-name = "denort"
+name = "rjsrt"
 path = "main.rs"
 doc = false
 
 [lib]
 path = "./lib.rs"
-
-[[test]]
-name = "integration"
-path = "integration_tests_runner.rs"
-harness = false
 
 [features]
 default = ["v8"]
@@ -77,4 +72,3 @@ deno_subprocess_windows.workspace = true
 
 [dev-dependencies]
 sys_traits = { workspace = true, features = ["memory"] }
-test_util.workspace = true

@@ -1,5 +1,0 @@
-{
-  "name": "@denotest/flag",
-  "version": "1.0.0",
-  "exports": "./mod.ts"
-}

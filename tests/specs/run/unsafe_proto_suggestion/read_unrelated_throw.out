@@ -1,4 +1,0 @@
-error: Uncaught (in promise) Error: boom
-throw new Error("boom");
-      ^
-    at [WILDCARD]read_unrelated_throw.js:6:7

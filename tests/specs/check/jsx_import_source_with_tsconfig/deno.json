@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
-  },
-  "imports": {
-    "preact/jsx-runtime": "./jsx_runtime.ts"
-  }
-}

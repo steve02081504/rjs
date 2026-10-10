@@ -1,7 +1,0 @@
-┌[WILDLINE]
-│ [WILDLINE]
-├[WILDLINE]
-│ jsr:@denotest/add [WILDLINE]
-├[WILDLINE]
-│ npm:@denotest/esm-import-cjs-default [WILDLINE]
-└[WILDLINE]

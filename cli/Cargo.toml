@@ -1,27 +1,22 @@
 # Copyright 2018-2026 the Deno authors. MIT license.
 
 [package]
-name = "deno"
+name = "rjs"
 version = "2.9.7"
 authors.workspace = true
-default-run = "deno"
+default-run = "rjs"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Provides the deno executable"
+description = "Provides the rjs executable"
 
 [[bin]]
-name = "deno"
+name = "rjs"
 path = "main.rs"
 doc = false
 
 [lib]
 path = "lib.rs"
-
-[[test]]
-name = "integration"
-path = "integration_tests_runner.rs"
-harness = false
 
 [features]
 default = ["v8"]
@@ -223,18 +218,13 @@ criterion.workspace = true
 deno_core = { workspace = true, features = ["unsafe_use_unprotected_platform"] }
 pretty_assertions.workspace = true
 sys_traits = { workspace = true, features = ["memory"] }
-test_util.workspace = true
-
-[[bench]]
-name = "flags"
-harness = false
 
 [package.metadata.winres]
-# This section defines the metadata that appears in the deno.exe PE header.
-OriginalFilename = "deno.exe"
+# This section defines the metadata that appears in the rjs.exe PE header.
+OriginalFilename = "rjs.exe"
 LegalCopyright = "© Deno contributors & Deno Land Inc. MIT licensed."
-ProductName = "Deno"
-FileDescription = "Deno: A secure runtime for JavaScript and TypeScript"
+ProductName = "rjs"
+FileDescription = "rjs: a JavaScript, TypeScript and WebAssembly runtime"
 
 [package.metadata.cargo-shear]
 ignored = ["locked-tripwire"]

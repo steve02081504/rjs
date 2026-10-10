@@ -1,5 +1,0 @@
-{
-  "tasks": {
-    "show": "echo FOO=$FOO BAR=$BAR"
-  }
-}

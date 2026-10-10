@@ -1,6 +1,0 @@
-[Module: null prototype] {
-  func: [Function: 0],
-  global: 0,
-  memory: Memory [WebAssembly.Memory] {},
-  table: Table [WebAssembly.Table] {}
-}

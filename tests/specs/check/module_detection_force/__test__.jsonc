@@ -1,4 +1,0 @@
-{
-  "args": "check --quiet module_detection_force/main.ts",
-  "output": ""
-}

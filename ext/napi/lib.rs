@@ -14,13 +14,14 @@
 //! Symbols to be exported are now defined in this JSON file.
 //! The `#[napi_sym]` macro checks for missing entries and panics.
 //!
-//! `./tools/napi/generate_symbols_list.js` is used to generate the LINK `cli/exports.def` on Windows,
+//! `tools/napi/generate_symbols_list.js` from the upstream denoland/deno tree
+//! is used to generate the LINK `cli/exports.def` on Windows,
 //! which is also checked into git.
 //!
 //! To add a new napi function:
 //! 1. Place `#[napi_sym]` on top of your implementation.
 //! 2. Add the function's identifier to this JSON list.
-//! 3. Finally, run `tools/napi/generate_symbols_list.js` to update `ext/napi/generated_symbol_exports_list_*.def`.
+//! 3. Finally, run that upstream script to update `ext/napi/generated_symbol_exports_list_*.def`.
 
 pub mod js_native_api;
 pub mod node_api;
@@ -106,7 +107,7 @@ pub enum NApiError {
   #[class(type)]
   #[error(
     "Cannot load native addon at {}: it was built against the legacy Node.js \
-     native addon API (NODE_MODULE / nan), which Deno does not support. Only \
+     native addon API (NODE_MODULE / nan), which rjs does not support. Only \
      Node-API (N-API) addons are supported.",
     .0.display()
   )]
@@ -115,7 +116,7 @@ pub enum NApiError {
   #[error(
     "Cannot load native addon at {}: it links directly against the Node.js \
      binary (node.exe) and relies on the V8 C++ ABI, Node.js internals and/or \
-     libuv exported by that executable, none of which Deno provides. An addon \
+     libuv exported by that executable, none of which rjs provides. An addon \
      can use Node-API (N-API) and still be unsupported when it has a regular \
      import of node.exe. The addon must be rebuilt to avoid linking directly \
      against node.exe, for example by using delay-loaded node.exe imports.",
