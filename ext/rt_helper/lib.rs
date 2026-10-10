@@ -20,7 +20,7 @@ const NATIVE_ADDON_CACHE_DIR_NAME: &str = "deno-native-addons";
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum LoadError {
   #[class(generic)]
-  #[error("Failed to write native addon (Deno FFI/Node API) '{0}' to '{1}' because the file system was readonly. This is a limitation of native addons with deno compile.", executable_path.display(), real_path.display())]
+  #[error("Failed to write native addon (Deno FFI/Node API) '{0}' to '{1}' because the file system was readonly. This is a limitation of native addons with rjs compile.", executable_path.display(), real_path.display())]
   ReadOnlyFilesystem {
     real_path: PathBuf,
     executable_path: PathBuf,
@@ -58,7 +58,7 @@ pub trait DenoRtNativeAddonLoader: Send + Sync {
           .as_ref()
           .and_then(|p| p.file_stem())
           .map(|s| s.to_string_lossy())
-          .unwrap_or("denort".into());
+          .unwrap_or("rjsrt".into());
         let cache_dir = native_addon_cache_dir().map_err(LoadError::Io)?;
         let real_path =
           resolve_temp_file_name(cache_dir, &exe_name, path, &bytes);

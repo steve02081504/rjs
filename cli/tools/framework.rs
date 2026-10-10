@@ -258,7 +258,7 @@ pub fn detect_framework(
 fn deno_exe() -> String {
   std::env::current_exe()
     .map(|p| p.display().to_string())
-    .unwrap_or_else(|_| "deno".into())
+    .unwrap_or_else(|_| "rjs".into())
 }
 
 fn deno_task_build() -> Vec<String> {
@@ -613,9 +613,9 @@ fn detect_sveltekit(dir: &Path) -> Result<FrameworkDetection, AnyError> {
     ""
   };
   bail!(
-    "SvelteKit detected, but no adapter that `deno desktop` can bundle is \
+    "SvelteKit detected, but no adapter that `rjs desktop` can bundle is \
      configured.\n{auto_hint}Configure a supported adapter in your \
-     svelte.config:\n  - `@sveltejs/adapter-node` (runs under Deno via \
+     svelte.config:\n  - `@sveltejs/adapter-node` (runs under rjs via \
      Node.js compatibility)\n  - `@deno/svelte-adapter` (for Deno Deploy)"
   );
 }

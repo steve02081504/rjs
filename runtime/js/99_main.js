@@ -812,7 +812,7 @@ const finalDenoNs = ObjectDefineProperties(
     lint: {
       runPlugin: () => {
         throw new Error(
-          "`Deno.lint.runPlugin` is only available in `deno test` subcommand.",
+          "`Deno.lint.runPlugin` is only available in `rjs test` subcommand.",
         );
       },
     },
@@ -1016,7 +1016,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
             // Only error if main worker
             import.meta.log(
               "error",
-              `%cerror: %cdeno serve requires %cexport default { fetch }%c in the main module, did you mean to run \"deno run\"?`,
+              `%cerror: %crjs serve requires %cexport default { fetch }%c in the main module, did you mean to run \"rjs run\"?`,
               "color: yellow;",
               "color: inherit;",
               "font-weight: bold;",
@@ -1030,7 +1030,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
           if (mode === executionModes.run && !autoServe) {
             import.meta.log(
               "error",
-              `%cwarning: %cDetected %cexport default { fetch }%c, did you mean to run \"deno serve\"?`,
+              `%cwarning: %cDetected %cexport default { fetch }%c, did you mean to run \"rjs serve\"?`,
               "color: yellow;",
               "color: inherit;",
               "font-weight: bold;",
@@ -1129,7 +1129,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
           return jupyterNs;
         }
         throw new Error(
-          "Deno.jupyter is only available in `deno jupyter` subcommand",
+          "Deno.jupyter is only available in `rjs jupyter` subcommand",
         );
       },
       set(val) {

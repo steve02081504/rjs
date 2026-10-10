@@ -172,7 +172,7 @@ fn generate_zsh(cmd: &CommandDef) -> Vec<u8> {
     out.push_str(&format!("        '{}:{}'\n", sub.name, about));
   }
   out.push_str(
-    "    )\n    _describe -t commands 'deno commands' commands\n}\n\n",
+    "    )\n    _describe -t commands 'rjs commands' commands\n}\n\n",
   );
 
   // `deno [flags] <script>` runs the default subcommand, so the first

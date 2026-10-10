@@ -934,7 +934,7 @@ impl Inner {
     &mut self,
     params: InitializeParams,
   ) -> LspResult<InitializeResult> {
-    lsp_log!("Starting Deno language server...");
+    lsp_log!("Starting rjs language server...");
     let mark = self.performance.mark_with_args("lsp.initialize", &params);
 
     // exit this process when the parent is lost
@@ -1208,9 +1208,9 @@ impl Inner {
         lsp_warn!(
           concat!(
             "Hit the language server document preload limit of {} file system entries. ",
-            "You may want to use the \"deno.enablePaths\" configuration setting to only have Deno ",
+            "You may want to use the \"deno.enablePaths\" configuration setting to only have rjs ",
             "partially enable a workspace or increase the limit via \"deno.documentPreloadLimit\". ",
-            "In cases where Deno ends up using too much memory, you may want to lower the limit."
+            "In cases where rjs ends up using too much memory, you may want to lower the limit."
           ),
           document_preload_limit,
         );
@@ -2498,7 +2498,7 @@ impl Inner {
           }
         })?;
       if combined_code_actions.commands.is_some() {
-        error!("Deno does not support code actions with commands.");
+        error!("rjs does not support code actions with commands.");
         return Err(LspError::invalid_request());
       }
 

@@ -70,6 +70,8 @@ fn is_node_arg0(arg0: &OsString) -> bool {
   // Never misfire on the deno binary itself.
   if file_name.eq_ignore_ascii_case("deno")
     || file_name.eq_ignore_ascii_case("deno.exe")
+    || file_name.eq_ignore_ascii_case("rjs")
+    || file_name.eq_ignore_ascii_case("rjs.exe")
   {
     return false;
   }

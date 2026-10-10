@@ -594,7 +594,7 @@ pub const DESKTOP_JS: &str = r#"
       }),
     });
   } catch (e) {
-    console.error("[deno desktop] failed to install Notification permission API:", e);
+    console.error("[rjs desktop] failed to install Notification permission API:", e);
   }
 
   internals.defineEventHandler(NotificationPrototype, "show");
@@ -695,7 +695,7 @@ pub const DESKTOP_JS: &str = r#"
       configurable: true,
     });
   } catch (e) {
-    console.error("[deno desktop] failed to install navigator.permissions:", e);
+    console.error("[rjs desktop] failed to install navigator.permissions:", e);
   }
 
   // --- navigator.clipboard (text only) ---
@@ -764,7 +764,7 @@ pub const DESKTOP_JS: &str = r#"
       configurable: true,
     });
   } catch (e) {
-    console.error("[deno desktop] failed to install navigator.clipboard:", e);
+    console.error("[rjs desktop] failed to install navigator.clipboard:", e);
   }
 
   // Start polling loops immediately. Use core.unrefOpPromise so these

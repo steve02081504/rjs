@@ -105,7 +105,7 @@ pub fn op_inspector_open(
   }
 
   let server =
-    create_inspector_server(addr, "deno", InspectPublishUid::default())?;
+    create_inspector_server(addr, "rjs", InspectPublishUid::default())?;
 
   let inspector = state.borrow::<Rc<JsRuntimeInspector>>().clone();
   let main_module = state.borrow::<ModuleSpecifier>().to_string();

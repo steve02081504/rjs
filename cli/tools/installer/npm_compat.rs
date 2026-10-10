@@ -1346,7 +1346,7 @@ pub async fn install_http_modules(
       Ok(f) => f,
       Err(e) => {
         log::warn!(
-          "Skipping {requested_url}: {e} (try running `deno install --allow-import` to grant access)"
+          "Skipping {requested_url}: {e} (try running `rjs install --allow-import` to grant access)"
         );
         continue;
       }

@@ -189,7 +189,7 @@ while (offset < output.length) {
     path
   });
 
-  let mut child = std::process::Command::new("deno")
+  let mut child = std::process::Command::new("rjs")
     .arg("run")
     .arg("-A")
     .arg(minifier_path)

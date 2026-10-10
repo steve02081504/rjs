@@ -95,24 +95,24 @@ fn get_user_data_dir() -> Result<PathBuf, AnyError> {
 pub fn status(maybe_name: Option<&str>) -> Result<(), AnyError> {
   let user_data_dir = get_user_data_dir()?;
 
-  let kernel_name = maybe_name.unwrap_or("deno");
+  let kernel_name = maybe_name.unwrap_or("rjs");
   let kernel_spec_dir_path = user_data_dir.join("kernels").join(kernel_name);
   let kernel_spec_path = kernel_spec_dir_path.join("kernel.json");
 
   if kernel_spec_path.exists() {
     log::info!(
-      "✅ Deno kernel already installed at {}",
+      "✅ rjs kernel already installed at {}",
       kernel_spec_dir_path.display()
     );
     Ok(())
   } else {
-    let mut install_cmd = "deno jupyter --install".to_string();
+    let mut install_cmd = "rjs jupyter --install".to_string();
     if let Some(name) = maybe_name {
       install_cmd.push_str(" --name ");
       install_cmd.push_str(name);
     }
     log::warn!(
-      "ℹ️ Deno kernel is not yet installed, run `{}` to set it up",
+      "ℹ️ rjs kernel is not yet installed, run `{}` to set it up",
       install_cmd
     );
     Ok(())
@@ -137,7 +137,7 @@ pub fn install(
 ) -> Result<(), AnyError> {
   let user_data_dir = get_user_data_dir()?;
 
-  let kernel_name = maybe_name.unwrap_or("deno");
+  let kernel_name = maybe_name.unwrap_or("rjs");
   let kernel_spec_dir_path = user_data_dir.join("kernels").join(kernel_name);
   let kernel_spec_path = kernel_spec_dir_path.join("kernel.json");
 
@@ -150,12 +150,12 @@ pub fn install(
 
   if kernel_spec_path.exists() && !force {
     bail!(
-      "Deno kernel already exists at {}, run again with `--force` to overwrite it",
+      "rjs kernel already exists at {}, run again with `--force` to overwrite it",
       kernel_spec_dir_path.display()
     );
   }
 
-  let display_name = maybe_display_name.unwrap_or("Deno");
+  let display_name = maybe_display_name.unwrap_or("rjs");
   let current_exe_path = kernel_exe_path()?.to_string_lossy().into_owned();
 
   // TODO(bartlomieju): add remaining fields as per
@@ -188,7 +188,7 @@ pub fn install(
     .with_context(failed_icon_fn)?;
 
   log::info!(
-    "✅ Deno kernelspec installed successfully at {}.",
+    "✅ rjs kernelspec installed successfully at {}.",
     kernel_spec_dir_path.display()
   );
   Ok(())

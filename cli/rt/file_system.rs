@@ -738,7 +738,7 @@ fn not_supported(name: &str) -> std::io::Error {
   std::io::Error::new(
     ErrorKind::Unsupported,
     format!(
-      "{} is not supported for an embedded deno compile file",
+      "{} is not supported for an embedded rjs compile file",
       name
     ),
   )
@@ -1251,9 +1251,9 @@ impl VfsRoot {
         // "outside root" is the common host-FS fallback path in
         // desktop --hmr / runtime-dynamic imports. Don't print at all
         // by default; the caller falls through to a real filesystem
-        // read. Set DENO_LOG=denort=debug to see it.
+        // read. Set DENO_LOG=rjsrt=debug to see it.
         log::debug!(
-          target: "denort",
+          target: "rjsrt",
           "[VFS] path outside root '{}': {}",
           self.root_path.display(),
           path.display(),

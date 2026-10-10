@@ -1152,7 +1152,7 @@ impl LifecycleScriptsStrategy for HoistedLifecycleScripts {
         &mut output,
         "{}  Run \"{}\" to run build scripts.",
         colors::yellow("│"),
-        colors::bold("deno approve-scripts")
+        colors::bold("rjs approve-scripts")
       );
       _ = write!(&mut output, "{}", colors::yellow("╰─"));
 

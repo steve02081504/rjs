@@ -526,7 +526,7 @@ impl TestRun {
   }
 
   fn get_args(&self) -> Vec<Cow<'_, str>> {
-    let mut args = vec![Cow::Borrowed("deno"), Cow::Borrowed("test")];
+    let mut args = vec![Cow::Borrowed("rjs"), Cow::Borrowed("test")];
     args.extend(
       self
         .workspace_settings
@@ -649,7 +649,9 @@ fn extract_env_files_from_command(command: &str) -> Vec<String> {
   let mut env_files = Vec::new();
   let mut index = 0;
   while index + 1 < tokens.len() {
-    if tokens[index] == "deno" && tokens[index + 1] == "test" {
+    if (tokens[index] == "deno" || tokens[index] == "rjs")
+      && tokens[index + 1] == "test"
+    {
       index += 2;
       while index < tokens.len() && !is_shell_command_separator(&tokens[index])
       {

@@ -1584,7 +1584,7 @@ impl ConfigData {
 
     if let Some(deno_json) = member_dir.member_deno_json() {
       lsp_log!(
-        "  Resolved Deno configuration file: \"{}\"",
+        "  Resolved rjs configuration file: \"{}\"",
         deno_json.specifier
       );
 

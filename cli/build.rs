@@ -283,8 +283,8 @@ fn emit_laufey_version() {
   // During `cargo publish` the crate is verified in an isolated package dir
   // where the workspace lock is absent. The crate-local `Cargo.lock` cargo
   // bundles into the tarball is no help here either: `laufey` is a dependency
-  // of `denort_desktop`, not of the `deno` crate, so it never appears in the
-  // `deno` crate's own resolved lockfile. Fall back to the `# version:`
+  // of `rjsrt_desktop`, not of the `rjs` crate, so it never appears in the
+  // `rjs` crate's own resolved lockfile. Fall back to the `# version:`
   // directive committed in `cli/laufey_sums.lock`, which is always bundled into
   // the published tarball.
   if let Some(version) = laufey_version_from_lock(&workspace_lock) {
@@ -546,8 +546,8 @@ fn main() {
     return;
   }
 
-  deno_napi::print_linker_flags("deno");
-  deno_webgpu::print_linker_flags("deno");
+  deno_napi::print_linker_flags("rjs");
+  deno_webgpu::print_linker_flags("rjs");
 
   // Host snapshots won't work when cross compiling.
   let target = env::var("TARGET").unwrap();
@@ -573,11 +573,6 @@ fn main() {
     compress_sources(&out_dir);
   }
 
-  if let Ok(c) = env::var("DENO_CANARY") {
-    println!("cargo:rustc-env=DENO_CANARY={c}");
-  }
-  println!("cargo:rerun-if-env-changed=DENO_CANARY");
-
   println!("cargo:rustc-env=TARGET={}", env::var("TARGET").unwrap());
   println!("cargo:rustc-env=PROFILE={}", env::var("PROFILE").unwrap());
 
@@ -586,7 +581,7 @@ fn main() {
   #[cfg(target_os = "windows")]
   {
     let mut res = winres::WindowsResource::new();
-    res.set_icon("deno.ico");
+    res.set_icon("rjs.ico");
     // 0x0409 == MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US)
     res.set_language(0x0409);
     res.compile().unwrap();

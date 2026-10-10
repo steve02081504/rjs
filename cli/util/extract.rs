@@ -569,11 +569,11 @@ fn parse_shebang(shebang: &str) -> Shebang {
     std::path::Path::new(token)
       .file_stem()
       .and_then(|stem| stem.to_str())
-      == Some("deno")
+      .is_some_and(|stem| stem == "deno" || stem == "rjs")
   }) else {
-    return invalid("binary basename needs to be 'deno'");
+    return invalid("binary basename needs to be 'rjs'");
   };
-  let mut args = vec![OsString::from("deno")];
+  let mut args = vec![OsString::from("rjs")];
   args.extend(tokens[deno_index + 1..].iter().cloned().map(OsString::from));
   args.push(OsString::from("./__doctest_shebang__.ts"));
   match flags_from_vec(args) {
@@ -2055,7 +2055,7 @@ export function foo() {}
         expected: vec![Expected {
           source: r#"import { foo } from "file:///main.ts";
 Deno.test("file:///main.ts#3-7.ts", async ()=>{
-    throw new Error("invalid doc test hashbang: #!/bin/sh (binary basename needs to be 'deno')");
+    throw new Error("invalid doc test hashbang: #!/bin/sh (binary basename needs to be 'rjs')");
     foo();
 });
 "#,

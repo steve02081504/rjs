@@ -25,7 +25,7 @@ pub async fn check(
     // watcher, so it runs once and never re-checks. Warn rather than appear to
     // watch. See https://github.com/denoland/deno/issues/36089.
     log::warn!(
-      "{} `deno check --watch` does not re-check on file changes yet; it runs once. See https://github.com/denoland/deno/issues/36089",
+      "{} `rjs check --watch` does not re-check on file changes yet; it runs once. See https://github.com/denoland/deno/issues/36089",
       colors::yellow("Warning")
     );
     let no_clear_screen = watch_flags.no_clear_screen;
@@ -241,7 +241,7 @@ async fn native_check(
       &root_tsconfig,
     )?;
     let mut tmp = tempfile::Builder::new()
-      .prefix("deno-check-root-")
+      .prefix("rjs-check-root-")
       .suffix(".tsconfig.json")
       .tempfile_in(&project_root)?;
     std::io::Write::write_all(
@@ -339,7 +339,7 @@ async fn native_check(
       "files": files,
     });
     let mut tmp = tempfile::Builder::new()
-      .prefix("deno-check-")
+      .prefix("rjs-check-")
       .suffix(".tsconfig.json")
       .tempfile()?;
     std::io::Write::write_all(

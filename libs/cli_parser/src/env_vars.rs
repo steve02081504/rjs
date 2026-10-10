@@ -46,7 +46,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_INSTALL_ROOT",
-    description: "Set deno install's output directory",
+    description: "Set rjs install's output directory",
     example: Some("(defaults to $HOME/.deno/bin)"),
   },
   EnvVar {
@@ -91,7 +91,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_NO_UPDATE_CHECK",
-    description: "Set to disable checking if a newer Deno version is available",
+    description: "Set to disable checking if a newer rjs version is available",
     example: None,
   },
   EnvVar {
@@ -113,7 +113,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_AUTO_SERVE",
-    description: "If the entrypoint contains export default { fetch }, `deno run`\nbehaves like `deno serve`.",
+    description: "If the entrypoint contains export default { fetch }, `rjs run`\nbehaves like `rjs serve`.",
     example: None,
   },
   EnvVar {
@@ -133,7 +133,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_TSC_BIN",
-    description: "Path to a prebuilt native TypeScript compiler (tsc/tsgo) for `deno check` to use instead of downloading the pinned one.",
+    description: "Path to a prebuilt native TypeScript compiler (tsc/tsgo) for `rjs check` to use instead of downloading the pinned one.",
     example: None,
   },
   EnvVar {

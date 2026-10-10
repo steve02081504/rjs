@@ -798,17 +798,17 @@ pub fn enhanced_resolution_error_message(
         )
       } else if specifier.starts_with("@std/") {
         format!(
-          "If you want to use the JSR package, try running `deno add jsr:{}`",
+          "If you want to use the JSR package, try running `rjs add jsr:{}`",
           specifier
         )
       } else if specifier.starts_with('@') {
         format!(
-          "If you want to use a JSR or npm package, try running `deno add jsr:{0}` or `deno add npm:{0}`",
+          "If you want to use a JSR or npm package, try running `rjs add jsr:{0}` or `rjs add npm:{0}`",
           specifier
         )
       } else {
         format!(
-          "If you want to use the npm package, try running `deno add npm:{0}`",
+          "If you want to use the npm package, try running `rjs add npm:{0}`",
           specifier
         )
       }

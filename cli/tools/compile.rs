@@ -110,7 +110,7 @@ async fn compile_inner(
         && !matches!(flags.type_check_mode, TypeCheckMode::None)
       {
         log::info!(
-          "Disabling Deno type checking for {} compile; the framework handles app compilation itself",
+          "Disabling rjs type checking for {} compile; the framework handles app compilation itself",
           detection.name
         );
         flags.type_check_mode = TypeCheckMode::None;
@@ -188,7 +188,7 @@ async fn compile_inner(
 
   let _bundle_cleanup = if compile_flags.bundle {
     log::warn!(
-      "{} deno compile --bundle is experimental and may change.",
+      "{} rjs compile --bundle is experimental and may change.",
       colors::yellow("Warning")
     );
     // Auto-include the closest `package.json` to the entrypoint, if any.
@@ -762,7 +762,7 @@ pub async fn compile_binary(
     .await
     .with_context(|| {
       format!(
-        "Writing deno compile executable to temporary file '{}'",
+        "Writing rjs compile executable to temporary file '{}'",
         temp_path.display()
       )
     });

@@ -211,8 +211,8 @@ impl TargetKind {
 
   fn title(self) -> &'static str {
     match self {
-      TargetKind::Unified => "Deno Desktop (unified)",
-      TargetKind::Deno => "Deno Runtime",
+      TargetKind::Unified => "rjs Desktop (unified)",
+      TargetKind::Deno => "rjs Runtime",
       TargetKind::Cef => "CEF Renderer",
     }
   }
@@ -471,7 +471,7 @@ fn json_version(
     .map(String::from)
     .unwrap_or_else(|| state.listen.to_string());
   let body = json!({
-    "Browser": format!("deno-desktop/{}", env!("CARGO_PKG_VERSION")),
+    "Browser": format!("rjs-desktop/{}", env!("CARGO_PKG_VERSION")),
     "Protocol-Version": "1.3",
     "V8-Version": deno_core::v8::VERSION_STRING,
     // Advertise one of the two upstream WS URLs as the "browser" URL.
@@ -505,7 +505,7 @@ fn json_list(
     "id": state.unified_id.to_string(),
     "type": "page",
     "title": TargetKind::Unified.title(),
-    "description": "Unified DevTools (CEF page + Deno runtime)",
+    "description": "Unified DevTools (CEF page + rjs runtime)",
     "url": "deno-desktop://unified",
     "faviconUrl": "https://deno.land/favicon.ico",
     "devtoolsFrontendUrl": format!(
@@ -521,7 +521,7 @@ fn json_list(
     "id": state.deno_id.to_string(),
     "type": "node",
     "title": TargetKind::Deno.title(),
-    "description": "Deno runtime V8 isolate (direct)",
+    "description": "rjs runtime V8 isolate (direct)",
     "url": format!("deno://{}", state.config.deno_internal),
     "faviconUrl": "https://deno.land/favicon.ico",
     "devtoolsFrontendUrl": format!(
@@ -1352,7 +1352,7 @@ fn attached_to_target_event(session_id: &str) -> Value {
       "targetInfo": {
         "targetId": DENO_CHILD_TARGET_ID,
         "type": "worker",
-        "title": "Deno Runtime",
+        "title": "rjs Runtime",
         "url": "deno://runtime",
         "attached": true,
         "canAccessOpener": false,
@@ -1708,7 +1708,7 @@ mod tests {
 
     // Unified target.
     assert_eq!(list[0]["type"], "page");
-    assert_eq!(list[0]["title"], "Deno Desktop (unified)");
+    assert_eq!(list[0]["title"], "rjs Desktop (unified)");
     assert!(
       list[0]["webSocketDebuggerUrl"]
         .as_str()
@@ -1718,7 +1718,7 @@ mod tests {
 
     // Deno direct target.
     assert_eq!(list[1]["type"], "node");
-    assert_eq!(list[1]["title"], "Deno Runtime");
+    assert_eq!(list[1]["title"], "rjs Runtime");
     assert!(
       list[1]["webSocketDebuggerUrl"]
         .as_str()
@@ -1802,7 +1802,7 @@ mod tests {
       value["Browser"]
         .as_str()
         .unwrap()
-        .starts_with("deno-desktop/")
+        .starts_with("rjs-desktop/")
     );
     assert!(value["V8-Version"].is_string());
     // The browser-level webSocketDebuggerUrl must point at the CEF

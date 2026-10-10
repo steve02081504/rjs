@@ -49,7 +49,7 @@ struct PnpmWorkspace {
 /// resolve. When one of these is shown and a `pnpm-workspace.yaml` is nearby,
 /// the user is almost certainly in a pnpm workspace that Deno can't read.
 const RESOLUTION_FAILURE_MARKERS: &[&str] = &[
-  "Deno expects the node_modules/ directory to be up to date",
+  "rjs expects the node_modules/ directory to be up to date",
   "Could not find package.json with name",
   "Could not find a matching package for",
 ];
@@ -89,7 +89,7 @@ pub fn maybe_auto_migrate_pnpm_workspace(
     // We found a `pnpm-workspace.yaml` but couldn't convert it. Point the user
     // at it rather than failing silently; the migration is best-effort.
     Err(err) => Some(format!(
-      "\n\n{} Found {} nearby, which Deno does not read directly, but it could not be converted automatically: {}",
+      "\n\n{} Found {} nearby, which rjs does not read directly, but it could not be converted automatically: {}",
       colors::yellow("warning:"),
       colors::cyan("pnpm-workspace.yaml"),
       err,
@@ -115,7 +115,7 @@ fn auto_migrate(
     .with_context(|| format!("Writing '{}'", config_path.display()))?;
 
   let mut message = format!(
-    "\n\n{} Found {} nearby, which Deno does not read directly.\n{} Migrated its workspace configuration into {}. Run the command again.",
+    "\n\n{} Found {} nearby, which rjs does not read directly.\n{} Migrated its workspace configuration into {}. Run the command again.",
     colors::yellow("warning:"),
     colors::cyan("pnpm-workspace.yaml"),
     colors::intense_blue("hint:"),
@@ -123,7 +123,7 @@ fn auto_migrate(
   );
   if !parsed.unsupported_keys.is_empty() {
     message.push_str(&format!(
-      "\n{} these pnpm-workspace.yaml keys have no equivalent in Deno and were not migrated: {}",
+      "\n{} these pnpm-workspace.yaml keys have no equivalent in rjs and were not migrated: {}",
       colors::yellow("note:"),
       parsed.unsupported_keys.join(", "),
     ));

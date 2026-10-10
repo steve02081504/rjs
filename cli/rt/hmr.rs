@@ -362,7 +362,7 @@ impl DesktopHmrRunner {
 
     #[allow(
       clippy::disallowed_methods,
-      reason = "denort has no canonicalize helper; falls back to the original path"
+      reason = "rjsrt has no canonicalize helper; falls back to the original path"
     )]
     let watch_dir_canonical = watch_dir
       .canonicalize()
@@ -475,7 +475,7 @@ impl DesktopHmrRunner {
   ) -> ChangeOutcome {
     #[allow(
       clippy::disallowed_methods,
-      reason = "denort has no canonicalize helper; non-canonicalizable paths are handled below"
+      reason = "rjsrt has no canonicalize helper; non-canonicalizable paths are handled below"
     )]
     let canonical = match (change, path.canonicalize()) {
       (FileChange::Updated, Ok(p)) => p,

@@ -84,7 +84,7 @@ pub async fn ensure_native_tsc(
   npm_cache: &CliNpmCache,
 ) -> Result<PathBuf, AnyError> {
   // Allow pointing at an already-available `tsc` binary instead of downloading
-  // one, mirroring `DENORT_BIN`. Used by the test harness and CI to avoid
+  // one, mirroring `RJSRT_BIN`. Used by the test harness and CI to avoid
   // re-downloading the compiler for every run, and lets a user supply their
   // own build.
   if let Some(path) = std::env::var_os("DENO_TSC_BIN") {

@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! Desktop runtime for Deno (libdenort).
+//! Desktop runtime for Deno (librjsrt).
 //!
 //! This is a cdylib that exports the Laufey C ABI (laufey_runtime_init,
 //! laufey_runtime_start, laufey_runtime_shutdown) and boots the full Deno
@@ -34,8 +34,8 @@ use deno_lib::util::result::js_error_downcast_ref;
 use deno_lib::version::otel_runtime_config;
 use deno_runtime::fmt_errors::format_js_error;
 use deno_terminal::colors;
-use denort::desktop::DesktopApi;
-use denort::run::RunOptions;
+use rjsrt::desktop::DesktopApi;
+use rjsrt::run::RunOptions;
 
 /// Compile-time check: the laufey crate we're linking against must use the
 /// same C ABI version as the prebuilt backend we ship. If laufey bumps
@@ -48,7 +48,7 @@ const _: () = assert!(
   "LAUFEY_API_VERSION mismatch: update this assert and the prebuilt backend release pin in cli/tools/desktop.rs when laufey bumps its API version",
 );
 
-/// Laufey-backed implementation of [`denort::desktop::DesktopApi`].
+/// Laufey-backed implementation of [`rjsrt::desktop::DesktopApi`].
 struct WefDesktopApi {
   event_tx: deno_runtime::ops::desktop::DesktopEventTx,
   pending_responses: deno_runtime::ops::desktop::PendingBindResponses,
@@ -259,7 +259,7 @@ impl WefDesktopApi {
   }
 }
 
-impl denort::desktop::DesktopApi for WefDesktopApi {
+impl rjsrt::desktop::DesktopApi for WefDesktopApi {
   fn create_window(
     &self,
     width: i32,
@@ -378,7 +378,7 @@ impl denort::desktop::DesktopApi for WefDesktopApi {
         "[desktop] openDevtools(renderer={renderer}, deno={deno}) → {url}"
       );
       let window = laufey::Window::new(1200, 800);
-      window.set_title("Deno Desktop DevTools");
+      window.set_title("rjs Desktop DevTools");
       window.navigate(&url);
       let window = self.setup_window_events(window, false);
       let id = window.id();
@@ -511,7 +511,7 @@ impl denort::desktop::DesktopApi for WefDesktopApi {
   fn set_application_menu(
     &self,
     window_id: u32,
-    menu: Vec<denort::desktop::MenuItem>,
+    menu: Vec<rjsrt::desktop::MenuItem>,
   ) {
     let menu = menu
       .into_iter()
@@ -532,7 +532,7 @@ impl denort::desktop::DesktopApi for WefDesktopApi {
     window_id: u32,
     x: i32,
     y: i32,
-    menu: Vec<denort::desktop::MenuItem>,
+    menu: Vec<rjsrt::desktop::MenuItem>,
   ) {
     let menu = menu
       .into_iter()
@@ -658,7 +658,7 @@ impl denort::desktop::DesktopApi for WefDesktopApi {
     });
   }
 
-  fn set_dock_menu(&self, menu: Option<Vec<denort::desktop::MenuItem>>) {
+  fn set_dock_menu(&self, menu: Option<Vec<rjsrt::desktop::MenuItem>>) {
     match menu {
       Some(menu) => {
         let menu = menu
@@ -729,7 +729,7 @@ impl denort::desktop::DesktopApi for WefDesktopApi {
   fn set_tray_menu(
     &self,
     tray_id: u32,
-    menu: Option<Vec<denort::desktop::MenuItem>>,
+    menu: Option<Vec<rjsrt::desktop::MenuItem>>,
   ) {
     let trays = self.trays.lock().unwrap();
     let Some(tray) = trays.get(&tray_id) else {
@@ -894,10 +894,10 @@ fn map_permission_status(
 }
 
 fn desktop_menu_item_to_laufey_menu_item(
-  item: denort::desktop::MenuItem,
+  item: rjsrt::desktop::MenuItem,
 ) -> laufey::MenuItem {
   match item {
-    denort::desktop::MenuItem::Item {
+    rjsrt::desktop::MenuItem::Item {
       label,
       id,
       accelerator,
@@ -914,7 +914,7 @@ fn desktop_menu_item_to_laufey_menu_item(
       icon,
       tooltip,
     },
-    denort::desktop::MenuItem::Submenu { label, items } => {
+    rjsrt::desktop::MenuItem::Submenu { label, items } => {
       laufey::MenuItem::Submenu {
         label,
         items: items
@@ -923,8 +923,8 @@ fn desktop_menu_item_to_laufey_menu_item(
           .collect(),
       }
     }
-    denort::desktop::MenuItem::Separator => laufey::MenuItem::Separator,
-    denort::desktop::MenuItem::Role { role } => laufey::MenuItem::Role { role },
+    rjsrt::desktop::MenuItem::Separator => laufey::MenuItem::Separator,
+    rjsrt::desktop::MenuItem::Role { role } => laufey::MenuItem::Role { role },
   }
 }
 
@@ -1274,7 +1274,7 @@ laufey::main!(|| {
         } else if let Some(s) = panic_info.payload().downcast_ref::<String>() {
           s.clone()
         } else {
-          "Deno runtime panicked".to_string()
+          "rjs runtime panicked".to_string()
         };
 
         let location = panic_info
@@ -1295,8 +1295,8 @@ laufey::main!(|| {
       eprintln!(
         "\n============================================================"
       );
-      eprintln!("Deno has panicked. This is a bug in Deno. Please report this");
-      eprintln!("at https://github.com/denoland/deno/issues/new.");
+      eprintln!("rjs has panicked. This is a bug in rjs. Please report this");
+      eprintln!("at https://github.com/steve02081504/rjs/issues/new.");
       eprintln!();
       eprintln!("Platform: {} {}", env::consts::OS, env::consts::ARCH);
       eprintln!();
@@ -1306,7 +1306,7 @@ laufey::main!(|| {
     }));
   }
 
-  denort::init_logging(None, None);
+  rjsrt::init_logging(None, None);
 
   deno_runtime::deno_permissions::mark_standalone();
 
@@ -1345,7 +1345,7 @@ laufey::main!(|| {
   // worker / async tasks it spawns) would race with code that resolves
   // relative paths.
   let args: Vec<_> = env::args_os().collect();
-  let data = match denort::binary::extract_standalone_with_finder(
+  let data = match rjsrt::binary::extract_standalone_with_finder(
     Cow::Owned(args),
     find_section_in_dylib,
   ) {
@@ -1357,7 +1357,7 @@ laufey::main!(|| {
   };
   if data.metadata.self_extracting.is_some() {
     if let Err(e) =
-      denort::binary::extract_vfs_to_disk(&data.vfs, &data.root_path)
+      rjsrt::binary::extract_vfs_to_disk(&data.vfs, &data.root_path)
     {
       log::error!("[desktop] failed to extract VFS: {:?}", e);
       return;
@@ -1388,9 +1388,9 @@ laufey::main!(|| {
         Err(error) => {
           // A failure raised while the app's main module was still loading or
           // first evaluating is tagged `DesktopStartupError` (see
-          // `denort::run`). It carries its own pre-formatted message.
+          // `rjsrt::run`). It carries its own pre-formatted message.
           let startup =
-            error.downcast_ref::<denort::run::DesktopStartupError>();
+            error.downcast_ref::<rjsrt::run::DesktopStartupError>();
           let error_string = match startup {
             Some(startup) => startup.message.clone(),
             None => match js_error_downcast_ref(&error) {
@@ -1459,7 +1459,7 @@ fn run_on_runtime_thread<F: FnOnce() + Send + 'static>(f: F) {
 /// Run as a headless worker (no Laufey window). Used when a framework dev
 /// server forks child processes that re-execute this dylib.
 fn run_headless_worker() {
-  denort::init_logging(None, None);
+  rjsrt::init_logging(None, None);
   deno_runtime::deno_permissions::mark_standalone();
   rustls::crypto::aws_lc_rs::default_provider()
     .install_default()
@@ -1484,7 +1484,7 @@ fn run_headless_worker() {
     let fork_module = extract_fork_script_path(&args);
     log::debug!("[worker] fork_module: {:?}", fork_module);
 
-    let data = match denort::binary::extract_standalone_with_finder(
+    let data = match rjsrt::binary::extract_standalone_with_finder(
       Cow::Owned(args),
       find_section_in_dylib,
     ) {
@@ -1495,7 +1495,7 @@ fn run_headless_worker() {
       }
     };
 
-    denort::load_env_vars(&data.metadata.env_vars_from_env_file);
+    rjsrt::load_env_vars(&data.metadata.env_vars_from_env_file);
 
     let sys = if data.metadata.self_extracting.is_some() {
       // VFS should already be extracted by the parent process.
@@ -1508,19 +1508,19 @@ fn run_headless_worker() {
       {
         let _ = std::env::set_current_dir(&data.root_path);
       }
-      denort::file_system::DenoRtSys::new_self_extracting(data.vfs.clone())
+      rjsrt::file_system::DenoRtSys::new_self_extracting(data.vfs.clone())
     } else {
-      denort::file_system::DenoRtSys::new(data.vfs.clone())
+      rjsrt::file_system::DenoRtSys::new(data.vfs.clone())
     };
 
-    let options = denort::run::RunOptions {
+    let options = rjsrt::run::RunOptions {
       override_main_module: fork_module,
       ..Default::default()
     };
 
     log::debug!("[worker] starting run_with_options");
 
-    match denort::run::run_with_options(
+    match rjsrt::run::run_with_options(
       Arc::new(sys.clone()),
       sys,
       data,
@@ -1695,7 +1695,7 @@ fn find_section_in_dylib() -> Result<&'static [u8], AnyError> {
 async fn run_desktop(
   update_rolled_back: bool,
   desktop_serve_port: u16,
-  data: denort::binary::StandaloneData,
+  data: rjsrt::binary::StandaloneData,
 ) -> Result<(), AnyError> {
   // Make the error reporting URL available to the panic hook.
   if let Some(ref url) = data.metadata.error_reporting_url {
@@ -1709,9 +1709,9 @@ async fn run_desktop(
   // `laufey::main!` before the tokio runtime is built — chdir is
   // process-wide and isn't safe to do once async tasks are running.
   let sys = if data.metadata.self_extracting.is_some() {
-    denort::file_system::DenoRtSys::new_self_extracting(data.vfs.clone())
+    rjsrt::file_system::DenoRtSys::new_self_extracting(data.vfs.clone())
   } else {
-    denort::file_system::DenoRtSys::new(data.vfs.clone())
+    rjsrt::file_system::DenoRtSys::new(data.vfs.clone())
   };
 
   deno_runtime::deno_telemetry::init(
@@ -1719,11 +1719,11 @@ async fn run_desktop(
     otel_runtime_config(),
     data.metadata.otel_config.clone(),
   )?;
-  denort::init_logging(
+  rjsrt::init_logging(
     data.metadata.log_level,
     Some(data.metadata.otel_config.clone()),
   );
-  denort::load_env_vars(&data.metadata.env_vars_from_env_file);
+  rjsrt::load_env_vars(&data.metadata.env_vars_from_env_file);
 
   // Wire up the Deno-side inspector when launched under
   // `deno desktop --inspect[-brk|-wait]`. The parent process binds the
@@ -1802,7 +1802,7 @@ async fn run_desktop(
   let open_windows_for_api = open_windows.clone();
   let open_windows_for_hmr = open_windows.clone();
 
-  let hmr_on_reload: Option<denort::hmr::HmrReloadCallback> =
+  let hmr_on_reload: Option<rjsrt::hmr::HmrReloadCallback> =
     if hmr_watch_dir.is_some() && !is_framework_dev {
       Some(Box::new(move || {
         let ids: Vec<u32> = open_windows_for_hmr
@@ -1826,14 +1826,14 @@ async fn run_desktop(
   // Desktop extension: provides Deno.desktop.* APIs + auto-update
   #[cfg(unix)]
   let auto_update_state = get_dylib_path().map(|p| {
-    denort::desktop::AutoUpdateState {
+    rjsrt::desktop::AutoUpdateState {
       dylib_path: p,
       app_version: data.metadata.app_version.clone(),
       rolled_back: update_rolled_back, // from laufey::main! startup check
     }
   });
   #[cfg(not(unix))]
-  let auto_update_state: Option<denort::desktop::AutoUpdateState> = {
+  let auto_update_state: Option<rjsrt::desktop::AutoUpdateState> = {
     // Auto-update rollback is only wired up on unix; consume the flag so the
     // parameter isn't flagged as unused on other platforms.
     let _ = update_rolled_back;
@@ -1862,8 +1862,8 @@ async fn run_desktop(
     hmr_on_reload,
     op_state_init: Some(Box::new(move |state| {
       let (event_tx, event_rx) =
-        denort::desktop::create_desktop_event_channel();
-      let pending_responses = denort::desktop::PendingBindResponses::new();
+        rjsrt::desktop::create_desktop_event_channel();
+      let pending_responses = rjsrt::desktop::PendingBindResponses::new();
       let api = WefDesktopApi {
         event_tx: event_tx.0.clone(),
         pending_responses: pending_responses.clone(),
@@ -1903,7 +1903,7 @@ async fn run_desktop(
         api.set_title(window_id, name);
       }
 
-      denort::desktop::init_desktop_state(
+      rjsrt::desktop::init_desktop_state(
         state,
         Box::new(api),
         auto_update_state,
@@ -1911,7 +1911,7 @@ async fn run_desktop(
       state.put(event_rx);
       state.put(event_tx);
       state.put(pending_responses);
-      state.put(denort::desktop::InitialWindowId(std::sync::Mutex::new(
+      state.put(rjsrt::desktop::InitialWindowId(std::sync::Mutex::new(
         Some(window_id),
       )));
       if let Some(name) = app_name.filter(|n| !n.is_empty()) {
@@ -1936,7 +1936,7 @@ async fn run_desktop(
     .unwrap_or_else(|| format!("http://127.0.0.1:{}", desktop_serve_port));
   log::debug!("[desktop] starting runtime and laufey event loop");
   let run_fut =
-    denort::run::run_with_options(Arc::new(sys.clone()), sys, data, run_opts);
+    rjsrt::run::run_with_options(Arc::new(sys.clone()), sys, data, run_opts);
   let laufey_fut = laufey::run();
 
   // Wait for the server to be ready, then navigate the initial window.
@@ -2036,10 +2036,10 @@ async fn run_desktop(
     result = run_fut => {
       match result {
         Ok(exit_code) => {
-          log::debug!("[desktop] Deno runtime exited with code {}", exit_code);
+          log::debug!("[desktop] rjs runtime exited with code {}", exit_code);
         }
         Err(err) => {
-          log::error!("[desktop] Deno runtime error: {:?}", err);
+          log::error!("[desktop] rjs runtime error: {:?}", err);
           navigate_handle.abort();
           return Err(err);
         }
@@ -2185,7 +2185,7 @@ mod tests {
 
   #[test]
   fn menu_item_conversion_preserves_fields() {
-    let item = denort::desktop::MenuItem::Item {
+    let item = rjsrt::desktop::MenuItem::Item {
       label: "Save".into(),
       id: Some("file.save".into()),
       accelerator: Some("CmdOrCtrl+S".into()),
@@ -2218,10 +2218,10 @@ mod tests {
 
   #[test]
   fn menu_item_conversion_recurses_into_submenus() {
-    let item = denort::desktop::MenuItem::Submenu {
+    let item = rjsrt::desktop::MenuItem::Submenu {
       label: "File".into(),
       items: vec![
-        denort::desktop::MenuItem::Item {
+        rjsrt::desktop::MenuItem::Item {
           label: "Open".into(),
           id: Some("open".into()),
           accelerator: None,
@@ -2230,8 +2230,8 @@ mod tests {
           icon: None,
           tooltip: None,
         },
-        denort::desktop::MenuItem::Separator,
-        denort::desktop::MenuItem::Role {
+        rjsrt::desktop::MenuItem::Separator,
+        rjsrt::desktop::MenuItem::Role {
           role: "quit".into(),
         },
       ],

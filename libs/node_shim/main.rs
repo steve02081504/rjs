@@ -49,7 +49,7 @@ fn main() {
 
   // Handle entrypoint resolution for run commands
   node_shim::resolve_run_entrypoint(
-    std::path::Path::new("deno"),
+    std::path::Path::new("rjs"),
     &mut deno_args,
   );
 
@@ -62,7 +62,7 @@ fn main() {
   #[cfg(unix)]
   {
     use std::os::unix::process::CommandExt;
-    let err = process::Command::new("deno")
+    let err = process::Command::new("rjs")
       .arg0(&deno_args[0])
       .args(&deno_args[1..])
       .exec();
@@ -72,7 +72,7 @@ fn main() {
 
   #[cfg(not(unix))]
   {
-    let status = process::Command::new("deno")
+    let status = process::Command::new("rjs")
       .args(&deno_args[1..])
       .status()
       .expect("Failed to execute deno");

@@ -1,4 +1,4 @@
 # deno_lib
 
-This crate contains the shared code between the Deno CLI and denort. It is
+This crate contains the shared code between the rjs CLI and rjsrt. It is
 highly unstable.

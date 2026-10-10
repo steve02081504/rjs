@@ -1,24 +1,24 @@
 # Copyright 2018-2026 the Deno authors. MIT license.
 
 [package]
-name = "denort_desktop"
+name = "rjsrt_desktop"
 version = "2.7.4"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
 repository.workspace = true
-description = "Provides libdenort shared library for laufey desktop apps"
+description = "Provides librjsrt shared library for laufey desktop apps"
 
 [lib]
-name = "denort"
+name = "rjsrt"
 path = "lib.rs"
 crate-type = ["cdylib"]
 
 [features]
 default = ["v8"]
-quickjs = ["deno_core/quickjs", "denort/quickjs", "v8/quickjs"]
-v8 = ["deno_core/v8", "denort/v8", "v8/v8"]
+quickjs = ["deno_core/quickjs", "rjsrt/quickjs", "v8/quickjs"]
+v8 = ["deno_core/v8", "rjsrt/v8", "v8/v8"]
 
 [build-dependencies]
 deno_runtime.workspace = true
@@ -32,7 +32,7 @@ deno_lib.workspace = true
 deno_runtime.workspace = true
 deno_snapshots.workspace = true
 deno_terminal.workspace = true
-denort = { path = "../rt", default-features = false }
+rjsrt = { path = "../rt", default-features = false }
 laufey = "0.7.0"
 libsui.workspace = true
 

@@ -271,7 +271,7 @@ impl TestReporter for JunitTestReporter {
         });
     }
 
-    let report = JunitReport::new("deno test", *elapsed, suites.into_values());
+    let report = JunitReport::new("rjs test", *elapsed, suites.into_values());
 
     if self.output_path == "-" {
       report

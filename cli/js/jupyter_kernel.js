@@ -604,7 +604,7 @@ async function startJupyterKernel() {
     return {
       status: "ok",
       protocol_version: "5.3",
-      implementation: "Deno kernel",
+      implementation: "rjs kernel",
       implementation_version: op_jupyter_deno_version(),
       language_info: {
         name: "typescript",
@@ -615,8 +615,8 @@ async function startJupyterKernel() {
         codemirror_mode: "typescript",
         nbconvert_exporter: "script",
       },
-      banner: "Welcome to Deno kernel",
-      help_links: [{ text: "Visit Deno manual", url: "https://docs.deno.com" }],
+      banner: "Welcome to rjs kernel",
+      help_links: [{ text: "Visit rjs manual", url: "https://docs.deno.com" }],
       debugger: false,
     };
   }

@@ -1708,7 +1708,7 @@ function registerDeclarativeServer(exports) {
 
           internals.log(
             "info",
-            `%cdeno serve%c: Listening on %c${target}%c${nThreads}`,
+            `%crjs serve%c: Listening on %c${target}%c${nThreads}`,
             "color: green",
             "color: inherit",
             "color: yellow",

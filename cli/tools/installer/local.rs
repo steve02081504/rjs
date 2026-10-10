@@ -201,7 +201,7 @@ pub async fn ci_command(
   let factory = CliFactory::from_flags(flags.clone());
   if factory.maybe_lockfile().await?.is_none() {
     bail!(
-      "deno ci requires a lockfile, but none was found.\n  hint: run `deno install` to create one."
+      "rjs ci requires a lockfile, but none was found.\n  hint: run `rjs install` to create one."
     );
   }
   if let Some(node_modules_dir) = factory.node_modules_dir_path()?
@@ -501,7 +501,7 @@ pub fn check_if_installs_a_single_package_globally(
   };
   if matches!(url.scheme(), "http" | "https") {
     bail!(
-      "Failed to install \"{}\" specifier. If you are trying to install {} globally, run again with `-g` flag:\n  deno install -g {}",
+      "Failed to install \"{}\" specifier. If you are trying to install {} globally, run again with `-g` flag:\n  rjs install -g {}",
       url.scheme(),
       url.as_str(),
       url.as_str()

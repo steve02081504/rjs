@@ -1776,7 +1776,7 @@ pub async fn run_with_options(
     std::env::current_exe()
       .ok()
       .and_then(|p| p.file_stem().map(|s| s.to_string_lossy().into_owned()))
-      .unwrap_or_else(|| "deno-compile".to_string())
+      .unwrap_or_else(|| "rjs-compile".to_string())
   });
   // `--app-name` is validated at compile time (see `validate_app_name`), so it
   // is safe to use directly as a single directory component here.

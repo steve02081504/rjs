@@ -46,7 +46,7 @@ pub async fn desktop(
 ) -> Result<(), AnyError> {
   log::warn!(
     "{}",
-    colors::yellow_bold("⚠ deno desktop is experimental and subject to change")
+    colors::yellow_bold("⚠ rjs desktop is experimental and subject to change")
   );
 
   let all_targets = desktop_flags.all_targets;
@@ -359,7 +359,7 @@ async fn compile_desktop(
         && !matches!(flags.type_check_mode, TypeCheckMode::None)
       {
         log::info!(
-          "Disabling Deno type checking for Next.js desktop compile; Next handles app compilation itself"
+          "Disabling rjs type checking for Next.js desktop compile; Next handles app compilation itself"
         );
         flags.type_check_mode = TypeCheckMode::None;
       }
@@ -1547,7 +1547,7 @@ fn reserve_app_dir(app_dir: &Path) -> Result<(), AnyError> {
   if !is_ours && !is_empty {
     bail!(
       "Refusing to delete existing directory '{}': it was not created by \
-       `deno desktop`. The app name was inferred from the entrypoint or the \
+       `rjs desktop`. The app name was inferred from the entrypoint or the \
        project directory and collided with this directory. Pass --output to \
        choose a different name, or remove the directory yourself if it is a \
        leftover from an older build.",
@@ -1658,7 +1658,7 @@ async fn package_windows_app_dir(
     let _ = std::fs::remove_file(&cache_file);
   }
 
-  // Copy the compiled dylib (denort.dll) alongside the backend binary.
+  // Copy the compiled dylib (rjsrt.dll) alongside the backend binary.
   //
   // No `linux_colocated_runtime_name` equivalent is needed here: the Windows
   // launcher is `<app>.exe`, so the same chop-at-the-last-dot lookup removes a
@@ -1752,7 +1752,7 @@ async fn package_linux_app_dir(
   laufey_resolver: &LaufeyBackendResolver,
 ) -> Result<PathBuf, AnyError> {
   let parts = dylib_parts(dylib_path)?;
-  // `file_stem` on "libdenort.so" returns "libdenort" — strip the "lib" prefix
+  // `file_stem` on "librjsrt.so" returns "librjsrt" — strip the "lib" prefix
   // so the app directory is named after the app, not the runtime library.
   let app_name = parts
     .app_name
@@ -1972,7 +1972,7 @@ impl LaufeyBackendResolver {
     // releases) start rate-limiting empty UAs aggressively.
     let mut headers = http::HeaderMap::new();
     if let Ok(ua) = http::HeaderValue::from_str(&format!(
-      "deno-desktop/{} (+https://deno.com)",
+      "rjs-desktop/{} (+https://github.com/steve02081504/rjs)",
       env!("CARGO_PKG_VERSION")
     )) {
       headers.insert(http::header::USER_AGENT, ua);
@@ -2592,7 +2592,7 @@ fn codesign_macos_bundle(
   if !cfg!(target_os = "macos") {
     bail!(
       "codesigning requires a macOS build host (uses `codesign(1)`). \
-       Run `deno desktop` on macOS, or drop `macos.codesignIdentity` \
+       Run `rjs desktop` on macOS, or drop `macos.codesignIdentity` \
        from your deno.json when cross-building."
     );
   }
@@ -4584,7 +4584,7 @@ fn version_core_fields(version: &str) -> Vec<&str> {
 ///   <AppName>.bat          (launcher)
 ///   laufey.exe             (CEF backend)
 ///   libcef.dll, ...        (CEF support files)
-///   denort.dll             (compiled runtime + user code)
+///   rjsrt.dll             (compiled runtime + user code)
 ///   ...                    (nested dirs preserved)
 /// ```
 fn create_windows_msi(
@@ -4845,7 +4845,7 @@ fn create_windows_msi(
     summary.set_comments(format!("{app_name} desktop application"));
     summary.set_arch(arch);
     summary.set_languages(&[msi::Language::from_code(1033)]);
-    summary.set_creating_application("deno desktop");
+    summary.set_creating_application("rjs desktop");
     // Package code: a fresh GUID identifying this exact package build.
     summary.set_uuid(uuid::Uuid::new_v5(
       &MSI_GUID_NAMESPACE,

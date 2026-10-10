@@ -435,13 +435,13 @@ fn get_suggestions_for_terminal_errors(e: &JsError) -> Vec<FixSuggestion<'_>> {
   // `__proto__` once (feature detection) and then crashed for another reason.
   let info = if PROTO_SET_ATTEMPTED.load(Ordering::Relaxed) {
     Some(cstr!(
-      "This program assigned to <u>Object.prototype.__proto__</>, which Deno disables by default."
+      "This program assigned to <u>Object.prototype.__proto__</>, which rjs disables by default."
     ))
   } else if PROTO_GET_ATTEMPTED.load(Ordering::Relaxed)
     && error_mentions_proto(e)
   {
     Some(cstr!(
-      "This program read <u>Object.prototype.__proto__</>, which Deno disables by default (it returns <i>undefined</>)."
+      "This program read <u>Object.prototype.__proto__</>, which rjs disables by default (it returns <i>undefined</>)."
     ))
   } else {
     None
@@ -491,7 +491,7 @@ fn get_message_suggestions_inner(
       return vec![
         FixSuggestion::info_multiline(&[
           cstr!(
-            "Deno supports CommonJS modules in <u>.cjs</> files, or when the closest"
+            "rjs supports CommonJS modules in <u>.cjs</> files, or when the closest"
           ),
           cstr!(
             "<u>package.json</> has a <i>\"type\": \"commonjs\"</> option."
@@ -584,7 +584,7 @@ fn get_message_suggestions_inner(
       // Mozilla's. See denoland/deno#25366.
       return vec![
         FixSuggestion::info(
-          "The TLS certificate could not be verified against Deno's trusted certificate authorities.",
+          "The TLS certificate could not be verified against rjs's trusted certificate authorities.",
         ),
         FixSuggestion::hint_multiline(&[
           "If the certificate is trusted by your operating system (for example, issued",
@@ -613,7 +613,7 @@ fn get_message_suggestions_inner(
       return vec![
         FixSuggestion::info_multiline(&[
           "`isolated-vm` is a native addon built directly on V8's C++ internals,",
-          "which Deno does not expose, so it cannot be loaded in Deno.",
+          "which rjs does not expose, so it cannot be loaded in rjs.",
         ]),
         FixSuggestion::hint_multiline(&[
           "To run code in a separate isolate, use a `Worker`: it executes in its",
@@ -648,7 +648,7 @@ fn get_message_suggestions_inner(
         ]),
         FixSuggestion::hint_multiline(&[
           "Add `\"nodeModulesDir\": \"auto\" option to `deno.json`, and then run",
-          "`deno install --allow-scripts=npm:<package> --entrypoint <script>` to setup `node_modules` directory.",
+          "`rjs install --allow-scripts=npm:<package> --entrypoint <script>` to setup `node_modules` directory.",
         ]),
       ];
     // Captures the error thrown by `ext/napi` when a native addon was built
@@ -663,7 +663,7 @@ fn get_message_suggestions_inner(
         return vec![
           FixSuggestion::info_multiline(&[
             "`better-sqlite3` is built on the legacy V8/nan native addon ABI,",
-            "which depends on V8 internals that Deno does not expose.",
+            "which depends on V8 internals that rjs does not expose.",
           ]),
           FixSuggestion::hint_multiline(&[
             "Use a Node-API based alternative instead, such as the built-in",
@@ -675,8 +675,8 @@ fn get_message_suggestions_inner(
       return vec![
         FixSuggestion::info_multiline(&[
           "This native addon uses the legacy V8/nan addon ABI, which depends",
-          "on V8 internals that Deno does not expose. Only Node-API (N-API)",
-          "addons can be loaded by Deno.",
+          "on V8 internals that rjs does not expose. Only Node-API (N-API)",
+          "addons can be loaded by rjs.",
         ]),
         FixSuggestion::hint_multiline(&[
           "Switch to a package that uses Node-API (N-API), or ask the addon's",
@@ -686,7 +686,7 @@ fn get_message_suggestions_inner(
     } else if msg.contains("document is not defined") {
       return vec![
         FixSuggestion::info(cstr!(
-          "<u>document</> global is not available in Deno."
+          "<u>document</> global is not available in rjs."
         )),
         FixSuggestion::hint_multiline(&[
           cstr!(
