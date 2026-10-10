@@ -1,0 +1,353 @@
+name: build
+
+# rjs keeps a single release channel: `default`. Every push to master builds all
+# five targets and republishes one rolling tag + release whose assets are what
+# the rjs upgrade logic downloads:
+#
+#   https://github.com/steve02081504/rjs/releases/download/default/rjs-<target>.txt
+#   https://github.com/steve02081504/rjs/releases/download/default/rjs-<target>.zip
+#   https://github.com/steve02081504/rjs/releases/download/default/rjs-<target>.sha256
+#
+# The commit sha is the version; `default` is force-moved to the built commit on
+# every run and the assets are clobbered, so the sha in `rjs-<target>.txt` always
+# describes the zip next to it.
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  # Queue runs instead of canceling them: a publish that is already uploading
+  # assets must not be interrupted. GitHub drops a *pending* run when a newer one
+  # for the same group arrives, so the run that finally publishes is the newest
+  # commit — which is what a rolling release wants.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: full
+
+jobs:
+  build:
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 300
+    # Every target is built natively on a runner of the same architecture, so no
+    # cross compilation flags are involved and `target/release/rjs` is always the
+    # binary for `matrix.target`.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-24.04
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-24.04-arm
+          - target: x86_64-apple-darwin
+            runner: macos-15-intel
+          - target: aarch64-apple-darwin
+            runner: macos-14
+          - target: x86_64-pc-windows-msvc
+            runner: windows-2022
+    env:
+      RJS_TARGET: ${{ matrix.target }}
+      # Upstream sets this for release builds: the lazy extension sources that
+      # end up in the snapshot get minified, which is a large part of the final
+      # binary size.
+      DENO_SNAPSHOT_MINIFY_SOURCES: "1"
+    steps:
+      - name: Configure git
+        run: |
+          git config --global core.symlinks true
+          git config --global fetch.parallel 32
+
+      - name: Clone repository
+        uses: actions/checkout@v5
+        with:
+          # `cli/lib/build.rs` shells out to `git rev-list -1 HEAD` to stamp the
+          # binary with the commit sha, so `.git` must exist. The commit itself is
+          # the one that triggered the run, so depth 1 is enough.
+          fetch-depth: 1
+          submodules: false
+
+      - name: Record build sha
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          echo "RJS_COMMIT_SHA=$sha" >> "$GITHUB_ENV"
+          echo "building $RJS_TARGET from $sha"
+
+      - name: Install Rust toolchain from rust-toolchain.toml (1.95.0)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Remove macOS cURL --ipv4 flag
+        if: runner.os == 'macOS'
+        run: |
+          curl --version
+          which curl
+          # The runner image ships a ~/.curlrc that forces --ipv4 and makes crate
+          # and prebuilt downloads flaky.
+          rm ~/.curlrc || true
+
+      - name: Install LLVM for macOS linking
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          # `.cargo/config.toml` asks for `-fuse-ld=lld` (aarch64-apple-darwin) and
+          # `-Wl,-fixup_chains` (both darwin targets); upstream ships a prebuilt
+          # ld64.lld, which lived in the deleted tools/ directory. Homebrew's LLVM
+          # is keg-only, hence the explicit PATH entry.
+          brew install llvm || { brew update && brew install llvm; }
+          llvm_prefix="$(brew --prefix llvm)"
+          echo "$llvm_prefix/bin" >> "$GITHUB_PATH"
+          export PATH="$llvm_prefix/bin:$PATH"
+          command -v ld64.lld
+          ld64.lld --version
+          version="$(ld64.lld --version | grep -oE '[0-9]+' | head -n1)"
+          if [ -z "$version" ] || [ "$version" -lt 20 ]; then
+            echo "ld64.lld >= 20 is required (LLD 17 segfaults on -fixup_chains), got: $(ld64.lld --version)" >&2
+            exit 1
+          fi
+
+      - name: Log versions
+        run: |
+          rustc --version
+          cargo --version
+          if command -v ld64.lld > /dev/null 2>&1; then
+            ld64.lld --version
+          else
+            echo 'ld64.lld: not used on this platform'
+          fi
+
+      - name: Build release binaries (rjs and rjsrt)
+        env:
+          # The v8 crate downloads a prebuilt static library from GitHub; the token
+          # keeps the anonymous API/download rate limit from failing the build.
+          GITHUB_TOKEN: ${{ github.token }}
+        # One invocation for both bins: they share almost every dependency, so a
+        # second `cargo build` would only re-resolve dependencies.
+        #
+        # No `--locked`: this repository does not track `Cargo.lock` (it is
+        # gitignored), so every build resolves the dependency graph on its own and
+        # builds are not reproducible by design.
+        run: cargo build --release --bin rjs --bin rjsrt
+
+      - name: Package release (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          # Release profile is panic=abort, so the unwind sections are dead weight;
+          # this is upstream's strip recipe for the release binaries. `rjsrt` is the
+          # runtime `rjs compile` downloads at run time, so it ships the same way.
+          for name in rjs rjsrt; do
+            strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr "target/release/$name"
+            if readelf -SW "target/release/$name" | grep -Eq '\.eh_frame(_hdr)?'; then
+              echo "unwind sections remain in $name" >&2
+              exit 1
+            fi
+            if readelf -lW "target/release/$name" | grep -q GNU_EH_FRAME; then
+              echo "PT_GNU_EH_FRAME remains in $name" >&2
+              exit 1
+            fi
+          done
+          mkdir -p dist
+          # Ran from target/release so each archive root holds its binary and nothing
+          # else. No `rjsrt-<target>.txt`: only `rjs` needs the commit sha asset.
+          for name in rjs rjsrt; do
+            (cd target/release && zip -r "$GITHUB_WORKSPACE/dist/$name-$RJS_TARGET.zip" "$name")
+            (cd dist && shasum -a 256 "$name-$RJS_TARGET.zip" > "$name-$RJS_TARGET.sha256")
+          done
+
+      - name: Package release (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          for name in rjs rjsrt; do
+            strip -x -S "target/release/$name"
+          done
+          mkdir -p dist
+          for name in rjs rjsrt; do
+            (cd target/release && zip -r "$GITHUB_WORKSPACE/dist/$name-$RJS_TARGET.zip" "$name")
+            (cd dist && shasum -a 256 "$name-$RJS_TARGET.zip" > "$name-$RJS_TARGET.sha256")
+          done
+
+      - name: Package release (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $target = $env:RJS_TARGET
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          # Compress-Archive puts the executable at the root of the archive, same as
+          # upstream. MSVC binaries are not stripped.
+          foreach ($name in 'rjs', 'rjsrt') {
+            $archive = "${name}-$target.zip"
+            Compress-Archive -CompressionLevel Optimal -Force -Path "target/release/${name}.exe" -DestinationPath "dist/$archive"
+            $hash = (Get-FileHash "dist/$archive" -Algorithm SHA256).Hash.ToLowerInvariant()
+            # Same `<hash>  <name>` shape as `shasum -a 256`, always LF-terminated.
+            [System.IO.File]::WriteAllText((Join-Path $PWD "dist/${name}-$target.sha256"), "$hash  $archive`n")
+          }
+
+      - name: Smoke check the packaged binaries
+        run: |
+          set -euo pipefail
+          case "$RJS_TARGET" in
+            *windows*) rjs_binary=target/release/rjs.exe; rjsrt_binary=target/release/rjsrt.exe ;;
+            *) rjs_binary=target/release/rjs; rjsrt_binary=target/release/rjsrt ;;
+          esac
+          # Executes the exact `rjs` artifact that gets zipped: catches e.g. an arm64
+          # macOS ad-hoc signature invalidated by `strip` before it is published.
+          "$rjs_binary" --version
+          # `rjsrt` is a standalone-app runtime and cannot be executed on its own: it
+          # has no embedded VFS section, so `extract_standalone` (cli/rt/binary.rs)
+          # fails and it exits non-zero for any argv, `-V` included. Check instead
+          # that the pre-strip artifact is a present, non-empty, executable file.
+          if [ ! -s "$rjsrt_binary" ]; then
+            echo "$rjsrt_binary is missing or empty" >&2
+            exit 1
+          fi
+          case "$RJS_TARGET" in
+            *windows*) ;;
+            *)
+              if [ ! -x "$rjsrt_binary" ]; then
+                echo "$rjsrt_binary is not executable" >&2
+                exit 1
+              fi
+              ;;
+          esac
+          ls -l "$rjs_binary" "$rjsrt_binary"
+
+      - name: Write commit sha asset
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          printf '%s\n' "$RJS_COMMIT_SHA" > "dist/rjs-$RJS_TARGET.txt"
+          cat "dist/rjs-$RJS_TARGET.txt"
+          ls -l dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rjs-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    name: publish default
+    needs:
+      - build
+    # Only master may move the rolling tag: dispatching this workflow on a branch
+    # would otherwise repoint `default` (and therefore every upgrade client) at an
+    # unreviewed commit.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Verify assets
+        env:
+          RJS_TARGETS: x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu x86_64-apple-darwin aarch64-apple-darwin x86_64-pc-windows-msvc
+        run: |
+          set -euo pipefail
+          ls -l dist
+          sha=''
+          expected=''
+          for target in $RJS_TARGETS; do
+            case "$target" in
+              *windows*) rjs_binary=rjs.exe; rjsrt_binary=rjsrt.exe ;;
+              *) rjs_binary=rjs; rjsrt_binary=rjsrt ;;
+            esac
+            # rjs: zip + commit sha + zip digest. `rjs-<target>.txt` is what the
+            # upgrade client downloads, so it must name the commit this run built.
+            for asset in zip txt sha256; do
+              expected="$expected rjs-$target.$asset"
+              if [ ! -f "dist/rjs-$target.$asset" ]; then
+                echo "missing asset: rjs-$target.$asset" >&2
+                exit 1
+              fi
+            done
+            this_sha="$(tr -d '[:space:]' < "dist/rjs-$target.txt")"
+            if ! printf '%s' "$this_sha" | grep -Eq '^[0-9a-f]{40}$'; then
+              echo "rjs-$target.txt does not hold a 40 character sha: $this_sha" >&2
+              exit 1
+            fi
+            if [ "$this_sha" != "$GITHUB_SHA" ]; then
+              echo "rjs-$target.txt ($this_sha) does not match the commit this run built ($GITHUB_SHA)" >&2
+              exit 1
+            fi
+            sha="$this_sha"
+            (cd dist && shasum -a 256 -c "rjs-$target.sha256")
+            contents="$(unzip -Z1 "dist/rjs-$target.zip")"
+            if [ "$contents" != "$rjs_binary" ]; then
+              echo "rjs-$target.zip must contain only $rjs_binary at its root, got: $contents" >&2
+              exit 1
+            fi
+
+            # rjsrt: the runtime `rjs compile` downloads from this same release.
+            # Zip + digest, deliberately no `.txt` asset.
+            for asset in zip sha256; do
+              expected="$expected rjsrt-$target.$asset"
+              if [ ! -f "dist/rjsrt-$target.$asset" ]; then
+                echo "missing asset: rjsrt-$target.$asset" >&2
+                exit 1
+              fi
+            done
+            (cd dist && shasum -a 256 -c "rjsrt-$target.sha256")
+            contents="$(unzip -Z1 "dist/rjsrt-$target.zip")"
+            if [ "$contents" != "$rjsrt_binary" ]; then
+              echo "rjsrt-$target.zip must contain only $rjsrt_binary at its root, got: $contents" >&2
+              exit 1
+            fi
+          done
+          # Nothing else may reach the release: in particular no `rjsrt-<target>.txt`
+          # and no `librjsrt-*` desktop library (known gap, not shipped yet).
+          for path in dist/*; do
+            name="$(basename "$path")"
+            case " $expected " in
+              *" $name "*) ;;
+              *)
+                echo "unexpected asset in dist: $name" >&2
+                exit 1
+                ;;
+            esac
+          done
+          echo "RJS_COMMIT_SHA=$sha" >> "$GITHUB_ENV"
+
+      - name: Publish rolling default release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git tag -f default "$RJS_COMMIT_SHA"
+          git push -f origin refs/tags/default
+          notes="Rolling rjs build of commit $RJS_COMMIT_SHA"
+          if gh release view default > /dev/null 2>&1; then
+            gh release edit default --title default --notes "$notes" --prerelease=false --draft=false
+          else
+            gh release create default --title default --notes "$notes"
+          fi
+          gh release upload default dist/* --clobber
+          gh release view default --json tagName,isPrerelease,isDraft,assets
