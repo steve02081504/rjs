@@ -2263,7 +2263,7 @@ fn install_parse(
       if matches!(flags.config_flag, ConfigFlag::Disabled) {
         return Err(CliError::new(
           CliErrorKind::InvalidValue,
-          "deno install can't be used to add packages if `--no-config` is passed.",
+          "rjs install can't be used to add packages if `--no-config` is passed.",
         )
         .with_suggestion(
           "to cache the packages without adding to a config, pass the `--entrypoint` flag",
@@ -2494,7 +2494,7 @@ fn normalize_create_package_name(
   } else {
     Err(CliError::new(
       CliErrorKind::InvalidValue,
-      "Missing `jsr:` or `npm:` prefix. For example: `deno create npm:vite`.",
+      "Missing `jsr:` or `npm:` prefix. For example: `rjs create npm:vite`.",
     ))
   }
 }

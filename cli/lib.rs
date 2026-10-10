@@ -161,7 +161,7 @@ async fn run_subcommand(
     DenoSubcommand::Bundle(bundle_flags) => spawn_subcommand(async {
       log::warn!(
         "⚠️  {} is experimental and subject to changes",
-        colors::cyan("deno bundle")
+        colors::cyan("rjs bundle")
       );
       tools::bundle::bundle(Arc::new(flags), bundle_flags).await
     }),
@@ -219,7 +219,7 @@ async fn run_subcommand(
       spawn_subcommand(async move {
         log::warn!(
           "⚠️  {} is experimental and subject to changes",
-          colors::cyan("deno transpile")
+          colors::cyan("rjs transpile")
         );
         tools::transpile::transpile(Arc::new(flags), transpile_flags).await
       })
@@ -267,7 +267,7 @@ async fn run_subcommand(
   how to setup your favorite text editor.
 
   Press Ctrl+C to exit.
-        ", colors::cyan("deno lsp"));
+        ", colors::cyan("rjs lsp"));
       }
       lsp::start().await
     }),
@@ -506,7 +506,7 @@ async fn run_subcommand(
     }),
     #[cfg(not(feature = "upgrade"))]
     DenoSubcommand::Upgrade(_) => exit_with_message(
-      "This deno was built without the \"upgrade\" feature. Please upgrade using the installation method originally used to install Deno.",
+      "This rjs was built without the \"upgrade\" feature. Please upgrade using the installation method originally used to install rjs.",
       1,
     ),
     DenoSubcommand::Why(why_flags) => spawn_subcommand(async {
@@ -516,13 +516,13 @@ async fn run_subcommand(
       log::warn!(
         "{}",
         colors::yellow(
-          "deno bump-version is experimental and subject to change"
+          "rjs bump-version is experimental and subject to change"
         )
       );
       tools::bump_version::bump_version_command(Arc::new(flags), version_flags)
     }),
     DenoSubcommand::Vendor => exit_with_message(
-      "⚠️  `deno vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
+      "⚠️  `rjs vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
       1,
     ),
     DenoSubcommand::Publish(publish_flags) => spawn_subcommand(async {
